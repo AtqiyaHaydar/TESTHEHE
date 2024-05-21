@@ -1,151 +1,154 @@
 using System;
 using System.Collections.Generic;
 
-public class BoyerMoore
+namespace utils
 {
-    private int[] badCharTable;
-    private int[] goodSuffixTable;
-    private string pattern;
-    private int patternLength;
-
-    public BoyerMoore(string pattern)
+    public class BoyerMoore
     {
-        this.pattern = pattern;
-        this.patternLength = pattern.Length;
-        badCharTable = BuildBadCharTable(pattern);
-        goodSuffixTable = BuildGoodSuffixTable(pattern);
-    }
+        private int[] badCharTable;
+        private int[] goodSuffixTable;
+        private string pattern;
+        private int patternLength;
 
-    // Membangun bad character table
-    private int[] BuildBadCharTable(string pattern)
-    {
-        const int ASCII_SIZE = 256;
-        int[] table = new int[ASCII_SIZE];
-
-        // Inisialisasi semua kejadian sebagai -1
-        for (int i = 0; i < table.Length; i++)
+        public BoyerMoore(string pattern)
         {
-            table[i] = -1;
+            this.pattern = pattern;
+            this.patternLength = pattern.Length;
+            badCharTable = BuildBadCharTable(pattern);
+            goodSuffixTable = BuildGoodSuffixTable(pattern);
         }
 
-        // Menetapkan nilai karakter sebagai kejadian terakhirnya dalam pola
-        for (int i = 0; i < pattern.Length; i++)
+        // Membangun bad character table
+        private int[] BuildBadCharTable(string pattern)
         {
-            table[(int)pattern[i]] = i;
-        }
+            const int ASCII_SIZE = 256;
+            int[] table = new int[ASCII_SIZE];
 
-        return table;
-    }
-
-    // Membangun good sufix table
-    private int[] BuildGoodSuffixTable(string pattern)
-    {
-        int patternLength = pattern.Length;
-        int[] table = new int[patternLength];
-        int[] suffixes = new int[patternLength];
-
-        // Inisialisasi semua nilai ke nol
-        for (int i = 0; i < patternLength; i++)
-        {
-            suffixes[i] = 0;
-        }
-
-        // Prapemrosesan pola untuk menemukan suffix
-        suffixes[patternLength - 1] = patternLength;
-        int g = patternLength - 1;
-        int f = 0;
-
-        for (int i = patternLength - 2; i >= 0; i--)
-        {
-            if (i > g && suffixes[i + patternLength - 1 - f] < i - g)
+            // Inisialisasi semua kejadian sebagai -1
+            for (int i = 0; i < table.Length; i++)
             {
-                suffixes[i] = suffixes[i + patternLength - 1 - f];
+                table[i] = -1;
             }
-            else
+
+            // Menetapkan nilai karakter sebagai kejadian terakhirnya dalam pola
+            for (int i = 0; i < pattern.Length; i++)
             {
-                if (i < g)
-                {
-                    g = i;
-                }
-                f = i;
-                while (g >= 0 && pattern[g] == pattern[g + patternLength - 1 - f])
-                {
-                    g--;
-                }
-                suffixes[i] = f - g;
+                table[(int)pattern[i]] = i;
             }
+
+            return table;
         }
 
-        // Prapemrosesan untuk membangun good sufix table
-        for (int i = 0; i < patternLength; i++)
+        // Membangun good sufix table
+        private int[] BuildGoodSuffixTable(string pattern)
         {
-            table[i] = patternLength;
-        }
+            int patternLength = pattern.Length;
+            int[] table = new int[patternLength];
+            int[] suffixes = new int[patternLength];
 
-        int j = 0;
-        for (int i = patternLength - 1; i >= 0; i--)
-        {
-            if (suffixes[i] == i + 1)
+            // Inisialisasi semua nilai ke nol
+            for (int i = 0; i < patternLength; i++)
             {
-                for (; j < patternLength - 1 - i; j++)
+                suffixes[i] = 0;
+            }
+
+            // Prapemrosesan pola untuk menemukan suffix
+            suffixes[patternLength - 1] = patternLength;
+            int g = patternLength - 1;
+            int f = 0;
+
+            for (int i = patternLength - 2; i >= 0; i--)
+            {
+                if (i > g && suffixes[i + patternLength - 1 - f] < i - g)
                 {
-                    if (table[j] == patternLength)
+                    suffixes[i] = suffixes[i + patternLength - 1 - f];
+                }
+                else
+                {
+                    if (i < g)
                     {
-                        table[j] = patternLength - 1 - i;
+                        g = i;
+                    }
+                    f = i;
+                    while (g >= 0 && pattern[g] == pattern[g + patternLength - 1 - f])
+                    {
+                        g--;
+                    }
+                    suffixes[i] = f - g;
+                }
+            }
+
+            // Prapemrosesan untuk membangun good sufix table
+            for (int i = 0; i < patternLength; i++)
+            {
+                table[i] = patternLength;
+            }
+
+            int j = 0;
+            for (int i = patternLength - 1; i >= 0; i--)
+            {
+                if (suffixes[i] == i + 1)
+                {
+                    for (; j < patternLength - 1 - i; j++)
+                    {
+                        if (table[j] == patternLength)
+                        {
+                            table[j] = patternLength - 1 - i;
+                        }
                     }
                 }
             }
-        }
 
-        for (int i = 0; i <= patternLength - 2; i++)
-        {
-            table[patternLength - 1 - suffixes[i]] = patternLength - 1 - i;
-        }
-
-        return table;
-    }
-
-    // Metode pencarian untuk menemukan semua kemunculan pola dalam teks
-    public List<int> Search(string text)
-    {
-        List<int> occurrences = new List<int>();
-        int textLength = text.Length;
-        int skip;
-
-        for (int i = 0; i <= textLength - patternLength; i += skip)
-        {
-            skip = 0;
-            for (int j = patternLength - 1; j >= 0; j--)
+            for (int i = 0; i <= patternLength - 2; i++)
             {
-                if (pattern[j] != text[i + j])
+                table[patternLength - 1 - suffixes[i]] = patternLength - 1 - i;
+            }
+
+            return table;
+        }
+
+        // Metode pencarian untuk menemukan semua kemunculan pola dalam teks
+        public List<int> Search(string text)
+        {
+            List<int> occurrences = new List<int>();
+            int textLength = text.Length;
+            int skip;
+
+            for (int i = 0; i <= textLength - patternLength; i += skip)
+            {
+                skip = 0;
+                for (int j = patternLength - 1; j >= 0; j--)
                 {
-                    skip = Math.Max(1, j - badCharTable[text[i + j]]);
-                    skip = Math.Max(skip, goodSuffixTable[j]);
-                    break;
+                    if (pattern[j] != text[i + j])
+                    {
+                        skip = Math.Max(1, j - badCharTable[text[i + j]]);
+                        skip = Math.Max(skip, goodSuffixTable[j]);
+                        break;
+                    }
+                }
+                if (skip == 0)
+                {
+                    occurrences.Add(i);
+                    skip = goodSuffixTable[0];
                 }
             }
-            if (skip == 0)
-            {
-                occurrences.Add(i);
-                skip = goodSuffixTable[0];
-            }
+
+            return occurrences;
         }
 
-        return occurrences;
-    }
-
-    public static void Main(string[] args)
-    {
-        string text = "ANDHIKAFADILLAH";
-        string pattern = "LAH";
-
-        BoyerMoore bm = new BoyerMoore(pattern);
-        List<int> occurrences = bm.Search(text);
-
-        Console.WriteLine("Pola ditemukan di posisi:");
-        foreach (int position in occurrences)
+        public static void Main(string[] args)
         {
-            Console.WriteLine(position);
+            string text = "ANDHIKAFADILLAH";
+            string pattern = "LAH";
+
+            BoyerMoore bm = new BoyerMoore(pattern);
+            List<int> occurrences = bm.Search(text);
+
+            Console.WriteLine("Pola ditemukan di posisi:");
+            foreach (int position in occurrences)
+            {
+                Console.WriteLine(position);
+            }
         }
     }
 }

@@ -1,16 +1,19 @@
-using KMP;
 
-class Main
+
+namespace utils
 {
-    static void Main()
+    static class Main()
     {
-        
-        string P = "ABABABABCABABABAB"; //String tempat pencarian
-        string Q = "ABABABAB"; //String yang mau dicari
-        KMP(P,Q); // Hasil dibandingin dengan https://cmps-people.ok.ubc.ca/ylucet/DS/KnuthMorrisPratt.html
+        static void main()
+        {
+            string P = "ABABABABCABABABAB"; //String tempat pencarian
+            string Q = "ABABABAB"; //String yang mau dicari
+            KMP(P, Q); // Hasil dibandingin dengan https://cmps-people.ok.ubc.ca/ylucet/DS/KnuthMorrisPratt.html
 
-        // cara ngerun :
-        // csc src\KMP.cs
-        // ./KMP.exe
+            // cara ngerun :
+            // csc src\KMP.cs
+            // ./KMP.exe
+        }
+
     }
 }
