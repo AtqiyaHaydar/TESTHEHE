@@ -19,11 +19,6 @@ C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\GitHub\Tu
 C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\GitHub\Tubes3_Pejuang4Stima\Stime\obj\Debug\Stime.exe
 C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\GitHub\Tubes3_Pejuang4Stima\Stime\obj\Debug\Stime.pdb
 C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\obj\Debug\Stime.csproj.AssemblyReference.cache
-C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\obj\Debug\Stime.exe
-C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\obj\Debug\Stime.pdb
-C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\bin\Debug\Stime.exe.config
-C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\bin\Debug\Stime.exe
-C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\bin\Debug\Stime.pdb
 C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\obj\Debug\Stime.Form1.resources
 C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\obj\Debug\Stime.Properties.Resources.resources
 C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\obj\Debug\Stime.csproj.GenerateResource.cache

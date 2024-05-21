@@ -4,18 +4,20 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Collections.Generic;
+using Stime;
 
-namespace utils
+namespace Stime
 {
-    public class ImageToBin
+    public class ImageToBinary
     {
         // cara ngerun :
         // csc src\ImageToBinary.cs
         // ./ImageToBinary.exe
 
-        static void Main()
+        static void Main(imagePath)
         {
-            string imagePath = "fingering print.png"; //filepath dari image yang ingin di convert
+            
+            //filepath dari image yang ingin di convert
             List<string> binaryString = ImageToBinaryParts(imagePath, 30);
             string filePath = "outputBinary.txt"; // file txt buat output binary karena kalo di terminal gak cukup
 

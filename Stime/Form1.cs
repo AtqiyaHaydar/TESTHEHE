@@ -7,11 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Stime;
 
 namespace Stime
 {
     public partial class Form1 : Form
     {
+        private string inputFilePath = "";
+
         public Form1()
         {
             InitializeComponent();
@@ -35,10 +38,10 @@ namespace Stime
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     // Get the path of specified file
-                    string filePath = openFileDialog.FileName;
+                    inputFilePath = openFileDialog.FileName;
 
                     // Display image in PictureBox
-                    InputImage.Image = Image.FromFile(filePath);
+                    InputImage.Image = Image.FromFile(inputFilePath);
                 }
             }
         }
@@ -58,7 +61,18 @@ namespace Stime
         // Search Button
         private void searchButton_Click(object sender, EventArgs e)
         {
+            List<string> binaryString = ImageToBinary.ImageToBinaryParts(InputImage.Image, 30);
+            string filePath = "outputBinaryXX.txt"; 
 
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                // Write the long string to the file
+                foreach (string binString in binaryString)
+                {
+                    writer.WriteLine(binString);
+                }
+
+            }
         }
     }
 }
