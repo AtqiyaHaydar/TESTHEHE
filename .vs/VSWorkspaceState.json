@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Stime"
   ],
-  "SelectedNode": "\\Stime.sln",
+  "SelectedNode": "\\Stime\\Form1.cs",
   "PreviewInSolutionExplorer": false
 }
