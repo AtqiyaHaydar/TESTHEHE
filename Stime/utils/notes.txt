@@ -1,0 +1,82 @@
+string1 = abaab
+substring = baab
+l = 3
+
+loop i :0,1,2,3
+
+i = 0:
+    no
+i = 1;
+    j = 1:
+        string[0] != substring[2] no
+    j = 0:
+        string[1] != substring[3] no
+    valid == true
+    idx = 1;
+
+i = 2;
+    j = 2:
+        string1[0] != substring[1] no
+    j = 1:
+        string1[1] != substring[2] yes
+        valid = false
+        break
+    
+i = 3:
+    j = 3:
+        string1[0] != substring[0] yes
+        valid = false
+        break
+
+b a c b a b a b a a b c b a
+
+a b a b a c a
+
+idx1 = 0 ,idx2 = 0:
+    str1[idx1] != str2[idx2] -> yes
+        idx2 = Prefix(str2,0) -> 0
+    idx1++ -> 1
+
+idx1 = 1, idx2 = 0:
+    str1[1] != str2[0] -> no
+        idx2++ -> 1
+        idx1++ -> 2
+    str1[2] != str2[1] -> yes
+        idx2 = Prefix(str2,1) -> 0
+        idx1++ -> 3
+
+idx1 = 3, idx2 = 0
+
+
+abaaba
+
+shifts[1]:
+    front : ab
+    end : b
+
+shifts[2]:
+    front : aba 
+    end : ba
+    ln = 3
+    i = 0 :
+        j = 0:
+            front[0] != end[0]
+
+
+shifts[3]:
+    front : abaa 
+    end : baa
+
+shifts[4]:
+    front : abaab
+    end : baab
+    front_ln = 5
+    end_ln = 4
+    i = 0:
+        j = 0:
+            front[0] != end[4-0-1] -> yes
+            break;
+    i = 1:
+        j = 1:
+            front[0] != end[4-1-1] -> no
+            front[1] != end[4-0-1] -> no
