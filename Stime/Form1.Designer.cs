@@ -30,31 +30,30 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.InputImage = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.ChangeImageButton = new System.Windows.Forms.Button();
+            this.ResultImage = new System.Windows.Forms.PictureBox();
+            this.ListBiodatas = new System.Windows.Forms.Panel();
+            this.TubesStima = new System.Windows.Forms.Label();
+            this.ChooseImageButton = new System.Windows.Forms.Button();
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.BMButton = new System.Windows.Forms.Button();
+            this.KMPButton = new System.Windows.Forms.Button();
+            this.SearchButton = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.InputImage)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ResultImage)).BeginInit();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // InputImage
             // 
-            this.pictureBox1.BackColor = System.Drawing.Color.White;
-            this.pictureBox1.Location = new System.Drawing.Point(28, 90);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(300, 400);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
+            this.InputImage.BackColor = System.Drawing.Color.White;
+            this.InputImage.Location = new System.Drawing.Point(28, 90);
+            this.InputImage.Name = "InputImage";
+            this.InputImage.Size = new System.Drawing.Size(300, 400);
+            this.InputImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.InputImage.TabIndex = 0;
+            this.InputImage.TabStop = false;
             // 
             // pictureBox2
             // 
@@ -64,79 +63,81 @@
             this.pictureBox2.TabIndex = 1;
             this.pictureBox2.TabStop = false;
             // 
-            // pictureBox3
+            // ResultImage
             // 
-            this.pictureBox3.BackColor = System.Drawing.Color.White;
-            this.pictureBox3.Location = new System.Drawing.Point(351, 90);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(300, 400);
-            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox3.TabIndex = 2;
-            this.pictureBox3.TabStop = false;
+            this.ResultImage.BackColor = System.Drawing.Color.White;
+            this.ResultImage.Location = new System.Drawing.Point(351, 90);
+            this.ResultImage.Name = "ResultImage";
+            this.ResultImage.Size = new System.Drawing.Size(300, 400);
+            this.ResultImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.ResultImage.TabIndex = 2;
+            this.ResultImage.TabStop = false;
             // 
-            // panel1
+            // ListBiodatas
             // 
-            this.panel1.BackColor = System.Drawing.Color.White;
-            this.panel1.Location = new System.Drawing.Point(674, 90);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(300, 400);
-            this.panel1.TabIndex = 3;
+            this.ListBiodatas.BackColor = System.Drawing.Color.White;
+            this.ListBiodatas.Location = new System.Drawing.Point(674, 90);
+            this.ListBiodatas.Name = "ListBiodatas";
+            this.ListBiodatas.Size = new System.Drawing.Size(300, 400);
+            this.ListBiodatas.TabIndex = 3;
             // 
-            // label1
+            // TubesStima
             // 
-            this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Font = new System.Drawing.Font("Book Antiqua", 16.2F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.label1.Location = new System.Drawing.Point(24, 35);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(351, 34);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Tubes 3 Strategi Algoritma";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            this.TubesStima.AutoSize = true;
+            this.TubesStima.BackColor = System.Drawing.Color.Transparent;
+            this.TubesStima.Font = new System.Drawing.Font("Book Antiqua", 16.2F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TubesStima.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.TubesStima.Location = new System.Drawing.Point(24, 35);
+            this.TubesStima.Name = "TubesStima";
+            this.TubesStima.Size = new System.Drawing.Size(351, 34);
+            this.TubesStima.TabIndex = 4;
+            this.TubesStima.Text = "Tubes 3 Strategi Algoritma";
             // 
-            // ChangeImageButton
+            // ChooseImageButton
             // 
-            this.ChangeImageButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.ChangeImageButton.Location = new System.Drawing.Point(28, 522);
-            this.ChangeImageButton.Name = "ChangeImageButton";
-            this.ChangeImageButton.Size = new System.Drawing.Size(300, 50);
-            this.ChangeImageButton.TabIndex = 5;
-            this.ChangeImageButton.Text = "Choose an Image";
-            this.ChangeImageButton.UseVisualStyleBackColor = false;
+            this.ChooseImageButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.ChooseImageButton.Location = new System.Drawing.Point(28, 522);
+            this.ChooseImageButton.Name = "ChooseImageButton";
+            this.ChooseImageButton.Size = new System.Drawing.Size(300, 50);
+            this.ChooseImageButton.TabIndex = 5;
+            this.ChooseImageButton.Text = "Choose an Image";
+            this.ChooseImageButton.UseVisualStyleBackColor = false;
+            this.ChooseImageButton.Click += new System.EventHandler(this.chooseImage_Click);
             // 
-            // button2
+            // BMButton
             // 
-            this.button2.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.button2.Font = new System.Drawing.Font("Book Antiqua", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button2.Location = new System.Drawing.Point(351, 522);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(144, 50);
-            this.button2.TabIndex = 6;
-            this.button2.Text = "Boyer-Moore";
-            this.button2.UseVisualStyleBackColor = false;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.BMButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.BMButton.Font = new System.Drawing.Font("Book Antiqua", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BMButton.Location = new System.Drawing.Point(351, 522);
+            this.BMButton.Name = "BMButton";
+            this.BMButton.Size = new System.Drawing.Size(144, 50);
+            this.BMButton.TabIndex = 6;
+            this.BMButton.Text = "Boyer-Moore";
+            this.BMButton.UseVisualStyleBackColor = false;
+            this.BMButton.Click += new System.EventHandler(this.BM_Click);
             // 
-            // button3
+            // KMPButton
             // 
-            this.button3.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.button3.Font = new System.Drawing.Font("Book Antiqua", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.Location = new System.Drawing.Point(507, 522);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(144, 50);
-            this.button3.TabIndex = 7;
-            this.button3.Text = "Knuth-Morris-Pratt";
-            this.button3.UseVisualStyleBackColor = false;
+            this.KMPButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.KMPButton.Font = new System.Drawing.Font("Book Antiqua", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.KMPButton.Location = new System.Drawing.Point(507, 522);
+            this.KMPButton.Name = "KMPButton";
+            this.KMPButton.Size = new System.Drawing.Size(144, 50);
+            this.KMPButton.TabIndex = 7;
+            this.KMPButton.Text = "Knuth-Morris-Pratt";
+            this.KMPButton.UseVisualStyleBackColor = false;
+            this.KMPButton.Click += new System.EventHandler(this.KMP_Click);
             // 
-            // button4
+            // SearchButton
             // 
-            this.button4.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.button4.Location = new System.Drawing.Point(674, 522);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(300, 50);
-            this.button4.TabIndex = 8;
-            this.button4.Text = "Search";
-            this.button4.UseVisualStyleBackColor = false;
+            this.SearchButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.SearchButton.Location = new System.Drawing.Point(674, 522);
+            this.SearchButton.Name = "SearchButton";
+            this.SearchButton.Size = new System.Drawing.Size(300, 50);
+            this.SearchButton.TabIndex = 8;
+            this.SearchButton.Text = "Search";
+            this.SearchButton.UseVisualStyleBackColor = false;
+            this.SearchButton.Click += new System.EventHandler(this.searchButton_Click);
             // 
             // Form1
             // 
@@ -144,24 +145,24 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(1000, 610);
-            this.Controls.Add(this.button4);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.ChangeImageButton);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.pictureBox3);
+            this.Controls.Add(this.SearchButton);
+            this.Controls.Add(this.KMPButton);
+            this.Controls.Add(this.BMButton);
+            this.Controls.Add(this.ChooseImageButton);
+            this.Controls.Add(this.TubesStima);
+            this.Controls.Add(this.ListBiodatas);
+            this.Controls.Add(this.ResultImage);
             this.Controls.Add(this.pictureBox2);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.InputImage);
             this.Font = new System.Drawing.Font("Book Antiqua", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.InputImage)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ResultImage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -170,16 +171,16 @@
         #endregion
 
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox InputImage;
         private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.PictureBox pictureBox3;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button ChangeImageButton;
+        private System.Windows.Forms.PictureBox ResultImage;
+        private System.Windows.Forms.Panel ListBiodatas;
+        private System.Windows.Forms.Label TubesStima;
+        private System.Windows.Forms.Button ChooseImageButton;
         private System.ComponentModel.BackgroundWorker backgroundWorker2;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button BMButton;
+        private System.Windows.Forms.Button KMPButton;
+        private System.Windows.Forms.Button SearchButton;
     }
 }
 
