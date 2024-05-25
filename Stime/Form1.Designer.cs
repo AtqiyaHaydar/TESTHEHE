@@ -39,7 +39,7 @@
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.BMButton = new System.Windows.Forms.Button();
             this.KMPButton = new System.Windows.Forms.Button();
-            this.SearchButton = new System.Windows.Forms.Button();
+            this.SearchButtonFinal = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.InputImage)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ResultImage)).BeginInit();
@@ -128,16 +128,16 @@
             this.KMPButton.UseVisualStyleBackColor = false;
             this.KMPButton.Click += new System.EventHandler(this.KMP_Click);
             // 
-            // SearchButton
+            // SearchButtonFinal
             // 
-            this.SearchButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.SearchButton.Location = new System.Drawing.Point(674, 522);
-            this.SearchButton.Name = "SearchButton";
-            this.SearchButton.Size = new System.Drawing.Size(300, 50);
-            this.SearchButton.TabIndex = 8;
-            this.SearchButton.Text = "Search";
-            this.SearchButton.UseVisualStyleBackColor = false;
-            this.SearchButton.Click += new System.EventHandler(this.searchButton_Click);
+            this.SearchButtonFinal.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.SearchButtonFinal.Location = new System.Drawing.Point(674, 522);
+            this.SearchButtonFinal.Name = "SearchButtonFinal";
+            this.SearchButtonFinal.Size = new System.Drawing.Size(300, 50);
+            this.SearchButtonFinal.TabIndex = 8;
+            this.SearchButtonFinal.Text = "Search";
+            this.SearchButtonFinal.UseVisualStyleBackColor = false;
+            this.SearchButtonFinal.Click += new System.EventHandler(this.searchButton_Click);
             // 
             // Form1
             // 
@@ -145,7 +145,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(1000, 610);
-            this.Controls.Add(this.SearchButton);
+            this.Controls.Add(this.SearchButtonFinal);
             this.Controls.Add(this.KMPButton);
             this.Controls.Add(this.BMButton);
             this.Controls.Add(this.ChooseImageButton);
@@ -180,7 +180,7 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker2;
         private System.Windows.Forms.Button BMButton;
         private System.Windows.Forms.Button KMPButton;
-        private System.Windows.Forms.Button SearchButton;
+        private System.Windows.Forms.Button SearchButtonFinal;
     }
 }
 

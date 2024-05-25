@@ -23,3 +23,8 @@ C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstim
 C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\obj\Debug\Stime.Properties.Resources.resources
 C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\obj\Debug\Stime.csproj.GenerateResource.cache
 C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\obj\Debug\Stime.csproj.CoreCompileInputs.cache
+C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\bin\Debug\Stime.exe.config
+C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\bin\Debug\Stime.exe
+C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\bin\Debug\Stime.pdb
+C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\obj\Debug\Stime.exe
+C:\Users\atqee\OneDrive\Documents\Semester_4\Strategi_Algoritma\tubes3\tubesstime\Stime\obj\Debug\Stime.pdb
