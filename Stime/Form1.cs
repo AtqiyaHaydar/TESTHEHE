@@ -17,7 +17,11 @@ namespace Stime
     {
         private string inputFilePath = "";
         private string inputImagePath = "";
+        
         private List<string> binaryStringList = new List<string>();
+        private List<string> binaryToAsciiResult = new List<string>();
+
+        Boolean isInBMMode = true; // true jika mode BM, false jika mode KMP
 
         public Form1() {
             InitializeComponent();
@@ -59,20 +63,28 @@ namespace Stime
         // Search Button
         private void searchButton_Click(object sender, EventArgs e) {
             try {
+                // 1. Convert ke Binary 
                 binaryStringList = ImageToBinaryParts(inputImagePath, 30);
+                
                 string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../outputBinary.txt");
-
-                // Cek path file
-                MessageBox.Show("File will be saved to: " + filePath);
-
                 using (StreamWriter writer = new StreamWriter(filePath)) {
                     foreach (string binString in binaryStringList) {
                         writer.WriteLine(binString);
-                        Console.WriteLine(binString); // Print untuk melihat binary dalam terminal
                     }
                 }
 
-                DisplayBinaryStrings();
+                // 2. Convert ke ASCII
+                binaryToAsciiResult = BinaryToAscii(binaryStringList);
+
+                string filePathAscii = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../outputAscii.txt");
+                using (StreamWriter writer = new StreamWriter(filePathAscii))
+                {
+                    foreach (string asciiString in binaryToAsciiResult)
+                    {
+                        writer.WriteLine(asciiString);
+                    }
+                }
+
             }
             catch (Exception ex) {
                 MessageBox.Show("An error occurred: " + ex.Message);
@@ -130,11 +142,27 @@ namespace Stime
             }
         }
 
-        // Optional: Tambahkan metode untuk menampilkan hasil binary di UI jika diperlukan
-        private void DisplayBinaryStrings() {
-            foreach (string binString in binaryStringList) {
-                Console.WriteLine(binString);
+        // Fungsi convert list binary ke ascii
+        public List<string> BinaryToAscii(List<string> binaryStrings)
+        {
+            List<string> asciiStrings = new List<string>();
+
+            foreach (string binaryString in binaryStrings)
+            {
+                StringBuilder sb = new StringBuilder();
+
+                int l = binaryString.Length;
+                for (int i = 0; i < l; i += 8)
+                {
+                    string byteString = binaryString.Substring(i, 8);
+                    byte b = Convert.ToByte(byteString, 2);
+                    sb.Append((char)b);
+                }
+
+                asciiStrings.Add(sb.ToString());
             }
+
+            return asciiStrings;
         }
     }
 }
