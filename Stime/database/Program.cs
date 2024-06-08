@@ -2,82 +2,92 @@
 using System.Data;
 using MySql.Data.MySqlClient;
 using System.Data.SQLite;
+using System.Collections.Generic;
+using System.IO;
+using Faker;
+using Bogus;
 
 class Program
 {
     static void Main(string[] args)
     {
 
-        string query = "SELECT * FROM sidik_jari LIMIT 10";
-        string dbPath = "mydatabase.db";
+        // string query = "SELECT * FROM sidik_jari LIMIT 10";
+        string dbPath = "database.db";
 
         // Connection string for SQLite
         string connectionString = $"Data Source={dbPath};";
 
-        QueryDatabase(connectionString, query);
+        string createTableQuery = @"
+            CREATE TABLE sidik_jari (
+            berkas_citra TEXT,
+            nama TEXT
+            );
+        ";
 
-        // // Create a new database file
-        // SQLiteConnection.CreateFile(dbPath);
+        using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+        {
+            connection.Open();
 
-        // Console.WriteLine("Database file created successfully.");
+            using (SQLiteCommand command = new SQLiteCommand(createTableQuery, connection))
+            {
+                command.ExecuteNonQuery();
+            }
 
-        // // Create a connection to the database
-        // using (SQLiteConnection conn = new SQLiteConnection(connectionString))
-        // {
-        //     conn.Open();
-        //     Console.WriteLine("Connection to database established successfully.");
+            connection.Close();
+        }
 
-        //     // Example: Create a table
-        //     string createTableQuery = "CREATE TABLE sidik_jari (berkas_citra TEXT, nama VARCHAR(100))";
-        //     using (SQLiteCommand cmd = new SQLiteCommand(createTableQuery, conn))
-        //     {
-        //         cmd.ExecuteNonQuery();
-        //         Console.WriteLine("Table 'sidik_jari' created successfully.");
-        //     }
+        // Buat data palsu
+        List<string> fakeSidikJari = GenerateFakeSidikJariData(6000);
+        List<string> filepath = GetFilePaths("./assets");
 
-        //     // Example: Insert data
-        //     // Path to the assets folder
-        //     string assetsFolderPath = "./assets"; // Ubah ini dengan path yang sesuai
+        // Masukkan data palsu ke dalam database
+        InsertDataIntoDatabase(connectionString, filepath, fakeSidikJari);
 
-        //     // List of file paths to insert
-        //     List<string> filePaths = GetFilePaths(assetsFolderPath);
+        // Query database untuk melihat data yang dimasukkan
+        QueryDatabase(connectionString, "SELECT * FROM sidik_jari LIMIT 10");
 
-        //     // Call the function to insert data
-        //     InsertFilePathsIntoDatabase(connectionString, filePaths);
-
-        //     conn.Close();
-        //     Console.WriteLine("Connection to database closed.");
-        // }
     }
     
+    static List<string> GenerateFakeSidikJariData(int numberOfRecords)
+    {
+        var faker = new Bogus.Faker("id_ID");
+        var fakeDataList = new List<string>();
 
-    static void QueryDatabase(string connectionString, string query)
+        for (int i = 0; i < numberOfRecords; i++)
+        {
+            var nama = faker.Name.FullName();
+            // Pastikan nama tidak lebih panjang dari 10 karakter
+            if (nama.Length > 10)
+            {
+                nama = nama.Substring(0, 10); // Potong nama jika lebih dari 10 karakter
+            }
+            fakeDataList.Add(nama);
+        }
+
+        return fakeDataList;
+    }
+
+   
+     static void QueryDatabase(string connectionString, string query)
     {
         using (SQLiteConnection connection = new SQLiteConnection(connectionString))
         {
-            try
+            connection.Open();
+            using (SQLiteCommand command = new SQLiteCommand(query, connection))
             {
-                connection.Open();
-                Console.WriteLine("Connection to database established successfully.");
-
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-                SQLiteDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
+                using (SQLiteDataReader reader = command.ExecuteReader())
                 {
-                    // Console.WriteLine(string.Format("NIK: {0}, Nama: {1}", reader["NIK"], reader["Nama"]));
-                    Console.WriteLine(string.Format("berkas_citra: {0}", reader["berkas_citra"]));
+                    while (reader.Read())
+                    {
+                        Console.WriteLine(string.Format("berkas_citra: {0}, nama: {1}",  reader["berkas_citra"], reader["nama"]));
+                    }
                 }
-
-                reader.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
             }
         }
     }
 
+   
     // Function to get all file paths in a folder
         static List<string> GetFilePaths(string folderPath)
         {
@@ -97,56 +107,56 @@ class Program
         }
 
         // Function to insert file paths into the database using looping
-        static void InsertFilePathsIntoDatabase(string connectionString, List<string> filePaths)
+        static void InsertDataIntoDatabase(string connectionString, List<string> filePaths, List<string> fakeSidikJari)
+    {
+        using (SQLiteConnection conn = new SQLiteConnection(connectionString))
         {
-            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
+            try
             {
-                try
+                // Open the connection
+                conn.Open();
+                Console.WriteLine("Connection to database established successfully.");
+
+                for (int i = 0; i < filePaths.Count && i < fakeSidikJari.Count; i++)
                 {
-                    // Open the connection
-                    conn.Open();
-                    Console.WriteLine("Connection to database established successfully.");
+                    string filePath = filePaths[i];
+                    string nama = fakeSidikJari[i];
 
-                    foreach (var filePath in filePaths)
+                    // Prepare the SQL query
+                    string query = "INSERT INTO sidik_jari (berkas_citra, nama) VALUES (@berkas_citra, @nama)";
+
+                    using (SQLiteCommand cmd = new SQLiteCommand(query, conn))
                     {
-                        // Extract file name from the file path
-                        string fileName = Path.GetFileName(filePath);
+                        // Adding parameters to prevent SQL injection
+                        cmd.Parameters.AddWithValue("@berkas_citra", filePath);
+                        cmd.Parameters.AddWithValue("@nama", nama);
 
-                        // Prepare the SQL query
-                        string query = "INSERT INTO sidik_jari (berkas_citra) VALUES (@berkas_citra)";
+                        // Execute the query
+                        int result = cmd.ExecuteNonQuery();
 
-                        using (SQLiteCommand cmd = new SQLiteCommand(query, conn))
+                        // Check if the insertion was successful
+                        if (result > 0)
                         {
-                            // Adding parameters to prevent SQL injection
-                            cmd.Parameters.AddWithValue("@berkas_citra", filePath);
-                            // cmd.Parameters.AddWithValue("@nama", fileName);
-
-                            // Execute the query
-                            int result = cmd.ExecuteNonQuery();
-
-                            // Check if the insertion was successful
-                            if (result > 0)
-                            {
-                                Console.WriteLine($"File '{fileName}' has been inserted successfully.");
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Failed to insert file '{fileName}'.");
-                            }
+                            Console.WriteLine($"File '{Path.GetFileName(filePath)}' with name '{nama}' has been inserted successfully.");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Failed to insert file '{Path.GetFileName(filePath)}' with name '{nama}'.");
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    // Handle any errors
-                    Console.WriteLine("An error occurred: " + ex.Message);
-                }
-                finally
-                {
-                    // Close the connection
-                    conn.Close();
-                    Console.WriteLine("Connection to database closed.");
-                }
+            }
+            catch (Exception ex)
+            {
+                // Handle any errors
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
+            finally
+            {
+                // Close the connection
+                conn.Close();
+                Console.WriteLine("Connection to database closed.");
             }
         }
+    }
 }
