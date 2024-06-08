@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Stime;
 using System.Data.SQLite;
+using System.Text.RegularExpressions;
 
 namespace Stime
 {
@@ -144,6 +145,7 @@ namespace Stime
 
                 // 6. Pencarian dengan KMP atau BM
                 bool found = false;
+                string nameFound = "";
                 string mostSimilarResult = null;
                 double highestSimilarity = 0;
 
@@ -163,6 +165,32 @@ namespace Stime
                                 if (kmp.KMPfunc(inputAscii, asciiString))
                                 {
                                     found = true;
+                                    // Get nama dari pemilik sidik jari
+                                    query = "SELECT nama FROM sidik_jari WHERE berkas_citra=@asciiString";
+                                    using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                                    {
+                                        try
+                                        {
+                                            connection.Open();
+                                            SQLiteCommand command = new SQLiteCommand(query, connection);
+                                            command.Parameters.AddWithValue("@asciiString", asciiString);
+
+                                            using (SQLiteDataReader reader = command.ExecuteReader())
+                                            {
+                                                while (reader.Read())
+                                                {
+                                                    nameFound = reader.GetString(0);
+                                                }
+                                            }
+
+                                            reader.Close();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
+                                            MessageBox.Show("Error Terjadi", ex.Message);
+                                        }
+                                    }
                                     break;
                                 }
                             }
@@ -172,6 +200,32 @@ namespace Stime
                                 if (bm.Search(asciiString))
                                 {
                                     found = true;
+                                    // Get nama dari pemilik sidik jari
+                                    query = "SELECT nama FROM sidik_jari WHERE berkas_citra=@asciiString";
+                                    using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                                    {
+                                        try
+                                        {
+                                            connection.Open();
+                                            SQLiteCommand command = new SQLiteCommand(query, connection);
+                                            command.Parameters.AddWithValue("@asciiString", asciiString);
+
+                                            using (SQLiteDataReader reader = command.ExecuteReader())
+                                            {
+                                                while (reader.Read())
+                                                {
+                                                    nameFound = reader.GetString(0);
+                                                }
+                                            }
+
+                                            reader.Close();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
+                                            MessageBox.Show("Error Terjadi", ex.Message);
+                                        }
+                                    }
                                     break;
                                 }
                             }
@@ -203,20 +257,192 @@ namespace Stime
                             }
                         }
                     }
+
+                    query = "SELECT nama FROM sidik_jari WHERE berkas_citra=@mostSimiliarResult";
+                    using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                    {
+                        try
+                        {
+                            connection.Open();
+                            SQLiteCommand command = new SQLiteCommand(query, connection);
+                            command.Parameters.AddWithValue("@mostSimiliarResult", mostSimilarResult);
+
+                            using (SQLiteDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    nameFound = reader.GetString(0);
+                                }
+                            }
+
+                            reader.Close();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
+                            MessageBox.Show("Error Terjadi", ex.Message);
+                        }
+                    }
                 }
 
-
+                bool levenstheinFound = false;
                 if (found)
                 {
                     MessageBox.Show("Sidik jari ditemukan di database.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                else if (highestSimilarity > 80)
+                else if (highestSimilarity > 80) // Jelasin di laporan mengapa menggunakan batas 80
                 {
                     MessageBox.Show($"Sidik jari tidak ditemukan secara eksak di database. Hasil yang paling mirip memiliki kemiripan {highestSimilarity:F2}%.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    levenstheinFound = true;
                 }
                 else
                 {
                     MessageBox.Show("Sidik jari tidak ditemukan di database.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                // 8. Menemukan nama di basis data biodata yang sesuai dengan regex dan menampilkan biodatanya
+                query = "SELECT nama FROM sidik_jari LIMIT 10";
+                List<string> hasilQueryAlay = new List<string>();
+
+                using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                {
+                    try
+                    {
+                        connection.Open();
+                        SQLiteCommand command = new SQLiteCommand(query, connection);
+                        SQLiteDataReader reader = command.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            string berkasCitraAlay = reader["nama"].ToString();
+                            hasilQueryAlay.Add(berkasCitraAlay); // Memasukkan data dari database ke hasilQuery
+                            Console.WriteLine(string.Format("berkas_citra: {0}", berkasCitra));
+                        }
+
+                        reader.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
+                        MessageBox.Show("Error Terjadi", ex.Message);
+                    }
+                }
+
+                string regexedName = RegexMatcher.GetPattern(nameFound);
+                bool foundAlay = false;
+                string foundAlayName = "";
+
+                for (string alay in hasilQueryAlay)
+                {
+                    if (isKMP)
+                    {
+                        KMP kmp = new KMP();
+                        if (kmp.KMPfunc(regexedName, alay))
+                        {
+                            foundAlay = true;
+                            foundAlayName = alay;
+                            // Get biodata dari nama alay
+                            query = "SELECT * FROM biodata WHERE nama=@foundAlayName";
+                            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                            {
+                                try
+                                {
+                                    connection.Open();
+                                    SQLiteCommand command = new SQLiteCommand(query, connection);
+                                    command.Parameters.AddWithValue("@foundAlayName", foundAlayName);
+
+                                    // Menampilkan biodata di interface
+
+                                    reader.Close();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
+                                    MessageBox.Show("Error Terjadi", ex.Message);
+                                }
+                            }
+                            break;
+                        }
+                    } 
+                    else
+                    {
+                        BoyerMoore bm = new BoyerMoore(regexedName, alay);
+                        if (bm.Search(alay))
+                        {
+                            foundAlay = true;
+                            foundAlayName = alay;
+                            // Get biodata dari nama alay
+                            query = "SELECT * FROM biodata WHERE nama=@foundAlayName";
+                            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                            {
+                                try
+                                {
+                                    connection.Open();
+                                    SQLiteCommand command = new SQLiteCommand(query, connection);
+                                    command.Parameters.AddWithValue("@foundAlayName", foundAlayName);
+
+                                    // Menampilkan biodata di interface
+
+                                    reader.Close();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
+                                    MessageBox.Show("Error Terjadi", ex.Message);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                // 9. Apabila masih belum ditemukan, gunakan algoritma levensthein
+                if (!foundAlay)
+                {
+                    double highestSimilarityAlay = 0;
+                    string mostSimilarAlay = null;
+
+                    for (int i = 0; i < hasilQueryAlay.Count; i++)
+                    {
+                        string alay = hasilQueryAlay[i];
+                        double similarity = Levenshtein.ComputeSimilarityPercentage(regexedName, alay);
+                        if (similarity > highestSimilarityAlay)
+                        {
+                            highestSimilarityAlay = similarity;
+                            mostSimilarAlay = alay;
+                        }
+                    }
+
+                    if (highestSimilarityAlay > 80) // Misalnya menggunakan batas 80 untuk kemiripan
+                    {
+                        foundAlay = true;
+                        foundAlayName = mostSimilarAlay;
+                        // Get biodata dari nama alay
+                        query = "SELECT * FROM biodata WHERE nama=@foundAlayName";
+                        using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                        {
+                            try
+                            {
+                                connection.Open();
+                                SQLiteCommand command = new SQLiteCommand(query, connection);
+                                command.Parameters.AddWithValue("@foundAlayName", foundAlayName);
+
+                                // Menampilkan biodata di interface
+
+                                reader.Close();
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
+                                MessageBox.Show("Error Terjadi", ex.Message);
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                        MessageBox.Show("Tidak ada data yang cocok ditemukan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
 
             }
@@ -567,6 +793,178 @@ namespace Stime
             if (maxLen == 0) return 100.0; // Jika kedua string kosong
             double similarity = (1.0 - (double)distance / maxLen) * 100;
             return similarity;
+        }
+    }
+
+    public class RegexMatcher
+    {
+        // cara ngerun :
+        // csc src\regex.cs
+        // ./regex.exe
+        static void Main()
+        {
+            // Input string
+            string input = "Bintang Dwi Marthen"; // String dalam bentuk normal
+
+            //String dalam bentuk alay pake https://alaygenerator.blogspot.com/ buat nge generate, harusnya semuanya muncul di all matches found
+            string data = "13ntn6 DW1 m4rtH3n BNTAn6 Dw mrThn bnT4N6 Dw mrthN BNtNg dW mrth3n BNt4N6 dW mrthN bnTn6 dW Marthn bntng dwi mrthn bntng dW mRTh3n";
+
+            // Pattern to match
+            string pattern = GetPattern(input); // Generate Pattern
+            Console.WriteLine("pattern : " + pattern);
+
+            // Use Regex.Match to find the first match in the input string
+            Match match = Regex.Match(data, pattern);
+
+            // Check if a match is found
+            if (match.Success)
+            {
+                // Print the matched value
+                Console.WriteLine("First Match found: " + match.Value);
+            }
+            else
+            {
+                Console.WriteLine("No match found.");
+            }
+
+            // Use Regex.Matches to find all matches in the input string
+            MatchCollection matches = Regex.Matches(data, pattern);
+
+            // Print all matches found
+            Console.WriteLine("All matches found:");
+            int id = 1;
+            foreach (Match m in matches)
+            {
+                Console.WriteLine(id + "). " + m.Value);
+                id++;
+            }
+
+
+        }
+        public static string GetPattern(string awal)
+        {
+            string pattern = @"\b"; // Start of word boundary
+            foreach (char c_awal in awal)
+            {
+                bool matchFound = false; // Flag to track if a match is found
+
+                // Lowercase loop
+                for (char c = 'a'; c <= 'z'; c++)
+                {
+                    if (c_awal == c)
+                    {
+                        matchFound = true; // Set matchFound to true
+                        pattern += "([" + c + char.ToUpper(c); // Match lowercase or uppercase of the character
+                        switch (c)
+                        {
+                            case 'a':
+                                pattern += "4])?";
+                                break;
+                            case 'b':
+                                pattern += "]|[1][3])";
+                                break;
+                            case 'd':
+                                pattern += "]|[1][7])";
+                                break;
+                            case 'e':
+                                pattern += "3])?";
+                                break;
+                            case 'g':
+                                pattern += "6])";
+                                break;
+                            case 'i':
+                                pattern += "1])?";
+                                break;
+                            case 'o':
+                                pattern += "0])?";
+                                break;
+                            case 'r':
+                                pattern += "]|[1][2])";
+                                break;
+                            case 's':
+                                pattern += "5])";
+                                break;
+                            case 'u':
+                                pattern += "])?";
+                                break;
+                            case 'z':
+                                pattern += "2])";
+                                break;
+                            default:
+                                pattern += "])";
+                                break;
+                        }
+                        //pattern += "?";
+                        break; // Exit the lowercase loop
+                    }
+                }
+
+
+
+                // Uppercase loop
+                for (char c = 'A'; c <= 'Z'; c++)
+                {
+                    if (matchFound) // Check if a match is found in the lowercase loop
+                    {
+                        break;
+                    }
+                    if (c_awal == c)
+                    {
+                        matchFound = true;
+                        pattern += "([" + c + char.ToLower(c); // Match uppercase or lowercase of the character
+                        switch (c)
+                        {
+                            case 'A':
+                                pattern += "4])";
+                                break;
+                            case 'B':
+                                pattern += "]|[1][3])";
+                                break;
+                            case 'D':
+                                pattern += "]|[1][7])";
+                                break;
+                            case 'E':
+                                pattern += "3])";
+                                break;
+                            case 'G':
+                                pattern += "6])";
+                                break;
+                            case 'O':
+                                pattern += "0])?";
+                                break;
+                            case 'I':
+                                pattern += "1])";
+                                break;
+                            case 'R':
+                                pattern += "]|[1][2])";
+                                break;
+                            case 'S':
+                                pattern += "5])";
+                                break;
+                            case 'U':
+                                pattern += "])?";
+                                break;
+                            case 'Z':
+                                pattern += "2])";
+                                break;
+                            default:
+                                pattern += "])";
+                                break;
+                        }
+                        //pattern += "?";
+                        break; // Exit the uppercase loop
+
+                    }
+                }
+                if (!matchFound)
+                {
+                    pattern += c_awal;
+                }
+            }
+
+            pattern += @"\b"; // End of word boundary
+
+            return pattern;
         }
     }
 }
