@@ -284,7 +284,7 @@ namespace Stime
                     }
                 }
 
-                bool levenstheinFound = false;
+                // bool levenstheinFound = false;
                 if (found)
                 {
                     MessageBox.Show("Sidik jari ditemukan di database.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -292,7 +292,7 @@ namespace Stime
                 else if (highestSimilarity > 80) // Jelasin di laporan mengapa menggunakan batas 80
                 {
                     MessageBox.Show($"Sidik jari tidak ditemukan secara eksak di database. Hasil yang paling mirip memiliki kemiripan {highestSimilarity:F2}%.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    levenstheinFound = true;
+                    // levenstheinFound = true;
                     found = true;
                 }
                 else
@@ -321,7 +321,7 @@ namespace Stime
                             while (reader.Read())
                             {
                                 string berkasCitraAlay = reader["nama"].ToString();
-                                hasilQueryAlay.Add(berkasCitraAlay); // Memasukkan data dari database ke hasilQuery
+                                hasilQueryAlay.Add(berkasCitraAlay); // Memasukkan data dari database ke hasilQueryAlay
                                 Console.WriteLine(string.Format("berkas_citra: {0}", berkasCitraAlay));
                             }
 
@@ -442,7 +442,6 @@ namespace Stime
                         }
                         else
                         {
-
                             MessageBox.Show("Tidak ada data yang cocok ditemukan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
