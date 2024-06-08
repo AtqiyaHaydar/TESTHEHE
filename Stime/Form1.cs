@@ -73,7 +73,7 @@ namespace Stime
                 }
 
                 // 1. Convert ke Binary 
-                binaryStringList = ImageToBinaryParts(inputImagePath, 30);
+                binaryStringList = ImageToBinaryParts(inputImagePath, 64);
                 
                 string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../outputBinary.txt");
                 using (StreamWriter writer = new StreamWriter(filePath)) {
@@ -132,7 +132,7 @@ namespace Stime
                 List<List<string>> hasilBinary = new List<List<string>>();
                 foreach (string hasil in hasilQuery)
                 {
-                    hasilBinary.Add(ImageToBinaryParts("../../database" + hasil, 30));
+                    hasilBinary.Add(ImageToBinaryParts("../../database" + hasil, 64));
                 }
 
                 // 5. Convert setiap hasil binary ke ascii
