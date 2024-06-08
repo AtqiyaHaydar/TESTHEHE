@@ -10,12 +10,12 @@ namespace utils
         private string pattern;
         private int patternLength;
 
-        public BoyerMoore(string pattern)
+        public BoyerMoore(string str1, string str2)
         {
-            this.pattern = pattern;
-            this.patternLength = pattern.Length;
-            badCharTable = BuildBadCharTable(pattern);
-            goodSuffixTable = BuildGoodSuffixTable(pattern);
+            this.pattern = str1;
+            this.patternLength = str1.Length;
+            badCharTable = BuildBadCharTable(str1);
+            goodSuffixTable = BuildGoodSuffixTable(str1);
         }
 
         // Membangun bad character table
@@ -107,10 +107,9 @@ namespace utils
             return table;
         }
 
-        // Metode pencarian untuk menemukan semua kemunculan pola dalam teks
-        public List<int> Search(string text)
+        // Metode pencarian untuk memeriksa apakah pola ditemukan dalam teks
+        public bool Search(string text)
         {
-            List<int> occurrences = new List<int>();
             int textLength = text.Length;
             int skip;
 
@@ -128,26 +127,26 @@ namespace utils
                 }
                 if (skip == 0)
                 {
-                    occurrences.Add(i);
-                    skip = goodSuffixTable[0];
+                    return true;
                 }
             }
 
-            return occurrences;
+            return false;
         }
 
         public static void Main(string[] args)
         {
             string text = "ANDHIKAFADILLAH";
-            string pattern = "LAH";
+            string pattern = "ANDHIKAFADILLAH";
 
-            BoyerMoore bm = new BoyerMoore(pattern);
-            List<int> occurrences = bm.Search(text);
-
-            Console.WriteLine("Pola ditemukan di posisi:");
-            foreach (int position in occurrences)
+            BoyerMoore bm = new BoyerMoore(pattern, text);
+            if (bm.Search(text))
             {
-                Console.WriteLine(position);
+                Console.WriteLine("Pola ditemukan dalam teks.");
+            }
+            else
+            {
+                Console.WriteLine("Pola tidak ditemukan dalam teks.");
             }
         }
     }

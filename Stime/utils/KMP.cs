@@ -53,13 +53,13 @@ namespace utils
             return Borders;
         }
 
-        public void KMP(string str1, string str2)
+        public bool KMPfunc(string str1, string str2)
         {
             int[] Borders = Border(str2);
-            for (int i = 0; i < Borders.Length; i++)
-            { //ngecek hasil border function
-                Console.WriteLine("Largest border [" + i + "] : " + Borders[i]);
-            }
+            // for (int i = 0; i < Borders.Length; i++)
+            // { //ngecek hasil border function
+            //     Console.WriteLine("Largest border [" + i + "] : " + Borders[i]);
+            // }
 
             int l1 = str1.Length;
             int l2 = str2.Length;
@@ -81,16 +81,21 @@ namespace utils
             if (idx2 == l2 - 1)
             {
                 Console.WriteLine("Target found in index : " + (idx1 - idx2) + "-" + idx1);
+                return true;
             }
             else
             {
                 Console.WriteLine("Target Not Found");
+                return false;
             }
         }
 
-
+        public static void Main(string[] args)
+        {
+            KMP kmp = new KMP();
+            string str1 = "ABABDABACDABABCABAB";
+            string str2 = "ABABDABACDABABCABAB";
+            kmp.KMPfunc(str1, str2);
+        }
     }
-    
 }
-
-
