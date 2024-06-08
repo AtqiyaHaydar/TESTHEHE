@@ -128,26 +128,91 @@ namespace Stime
                     }
                 }
 
-                // convert hasil query ke binary
+                // 4. Convert setiap hasil query ke binary
                 List<List<string>> hasilBinary = new List<List<string>>();
                 foreach (string hasil in hasilQuery)
                 {
-                    hasilBinary.Add(ImageToBinaryParts(hasil, 30));
+                    hasilBinary.Add(ImageToBinaryParts("../../database" + hasil, 30));
                 }
 
-                // convert setiap hasil binary ke ascii
+                // 5. Convert setiap hasil binary ke ascii
                 List<List<string>> hasilAscii = new List<List<string>>();
                 foreach (List<string> hasil in hasilBinary)
                 {
                     hasilAscii.Add(BinaryToAscii(hasil));
                 }
 
-
+                // 6. Pencarian dengan KMP atau BM
                 bool found = false;
+                string mostSimilarResult = null;
+                double highestSimilarity = 0;
+
+                for (int i = 0; i < hasilAscii.Count; i++)
+                {
+                    List<string> ascii = hasilAscii[i];
+                    for (int j = 0; j < ascii.Count; j++)
+                    {
+                        if (j < binaryToAsciiResult.Count)
+                        {
+                            string asciiString = ascii[j];
+                            string inputAscii = binaryToAsciiResult[j];
+
+                            if (isKMP)
+                            {
+                                KMP kmp = new KMP();
+                                if (kmp.KMPfunc(inputAscii, asciiString))
+                                {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                BoyerMoore bm = new BoyerMoore(inputAscii, asciiString);
+                                if (bm.Search(asciiString))
+                                {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (found) break;
+                    }
+                    if (found) break;
+                }
+
+                // 7. Apabila belum menemukan, akan menggunakan Levensthein Distance dan dipilih hasil Rarity kesamaan yang terbesar
+                if (!found)
+                {
+                    for (int i = 0; i < hasilAscii.Count; i++)
+                    {
+                        List<string> ascii = hasilAscii[i];
+                        for (int j = 0; j < ascii.Count; j++)
+                        {
+                            if (j < binaryToAsciiResult.Count)
+                            {
+                                string asciiString = ascii[j];
+                                string inputAscii = binaryToAsciiResult[j];
+
+                                double similarity = Levenshtein.ComputeSimilarityPercentage(inputAscii, asciiString);
+                                if (similarity > highestSimilarity)
+                                {
+                                    highestSimilarity = similarity;
+                                    mostSimilarResult = asciiString;
+                                }
+                            }
+                        }
+                    }
+                }
+
 
                 if (found)
                 {
                     MessageBox.Show("Sidik jari ditemukan di database.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else if (highestSimilarity > 80)
+                {
+                    MessageBox.Show($"Sidik jari tidak ditemukan secara eksak di database. Hasil yang paling mirip memiliki kemiripan {highestSimilarity:F2}%.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
@@ -234,6 +299,9 @@ namespace Stime
             return asciiStrings;
         }
     }
+
+
+
     // Fungsi algortima Booyer More
     public class BoyerMoore
     {
