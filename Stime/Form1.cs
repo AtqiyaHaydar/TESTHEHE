@@ -128,32 +128,22 @@ namespace Stime
                     }
                 }
 
-                List<string> asciiStrings = BinaryToAscii(hasilQuery);
+                // convert hasil query ke binary
+                List<List<string>> hasilBinary = new List<List<string>>();
+                foreach (string hasil in hasilQuery)
+                {
+                    hasilBinary.Add(ImageToBinaryParts(hasil, 30));
+                }
+
+                // convert setiap hasil binary ke ascii
+                List<List<string>> hasilAscii = new List<List<string>>();
+                foreach (List<string> hasil in hasilBinary)
+                {
+                    hasilAscii.Add(BinaryToAscii(hasil));
+                }
+
 
                 bool found = false;
-                foreach (string asciiString in asciiStrings)
-                {
-                    if (isKMP)
-                    {
-                        // Pencarian dengan KMP
-                        KMP kmp = new KMP();
-                        if (kmp.KMPfunc(binaryToAsciiResult[0], asciiString))
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        // Pencarian dengan BM
-                        BoyerMoore bm = new BoyerMoore(binaryToAsciiResult[0], asciiString);
-                        if (bm.Search(asciiString))
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                }
 
                 if (found)
                 {
