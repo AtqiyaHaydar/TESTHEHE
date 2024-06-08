@@ -52,8 +52,8 @@ class Levenshtein
 
     static void Main()
     {
-        string s1 = "kitten";
-        string s2 = "sitting";
+        string s1 = "eaten";
+        string s2 = "eating";
 
         int distance = ComputeLevenshteinDistance(s1, s2);
         double similarity = ComputeSimilarityPercentage(s1, s2);
