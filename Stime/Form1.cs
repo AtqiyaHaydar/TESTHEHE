@@ -175,14 +175,13 @@ namespace Stime
                                             SQLiteCommand command = new SQLiteCommand(query, connection);
                                             command.Parameters.AddWithValue("@asciiString", asciiString);
 
-                                            using (SQLiteDataReader reader = command.ExecuteReader())
+                                            SQLiteDataReader reader = command.ExecuteReader();
+                                            
+                                            while (reader.Read())
                                             {
-                                                while (reader.Read())
-                                                {
-                                                    nameFound = reader.GetString(0);
-                                                }
+                                                nameFound = reader.GetString(0);
                                             }
-
+                                            
                                             reader.Close();
                                         }
                                         catch (Exception ex)
@@ -210,13 +209,13 @@ namespace Stime
                                             SQLiteCommand command = new SQLiteCommand(query, connection);
                                             command.Parameters.AddWithValue("@asciiString", asciiString);
 
-                                            using (SQLiteDataReader reader = command.ExecuteReader())
+                                            SQLiteDataReader reader = command.ExecuteReader();
+                                            
+                                            while (reader.Read())
                                             {
-                                                while (reader.Read())
-                                                {
-                                                    nameFound = reader.GetString(0);
-                                                }
+                                                nameFound = reader.GetString(0);
                                             }
+                                            
 
                                             reader.Close();
                                         }
@@ -267,13 +266,13 @@ namespace Stime
                             SQLiteCommand command = new SQLiteCommand(query, connection);
                             command.Parameters.AddWithValue("@mostSimiliarResult", mostSimilarResult);
 
-                            using (SQLiteDataReader reader = command.ExecuteReader())
-                            {
+                            SQLiteDataReader reader = command.ExecuteReader();
+                            
                                 while (reader.Read())
                                 {
                                     nameFound = reader.GetString(0);
                                 }
-                            }
+                            
 
                             reader.Close();
                         }
@@ -294,53 +293,132 @@ namespace Stime
                 {
                     MessageBox.Show($"Sidik jari tidak ditemukan secara eksak di database. Hasil yang paling mirip memiliki kemiripan {highestSimilarity:F2}%.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     levenstheinFound = true;
+                    found = true;
                 }
                 else
                 {
                     MessageBox.Show("Sidik jari tidak ditemukan di database.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
-                // 8. Menemukan nama di basis data biodata yang sesuai dengan regex dan menampilkan biodatanya
-                query = "SELECT nama FROM sidik_jari LIMIT 10";
-                List<string> hasilQueryAlay = new List<string>();
-
-                using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                if (found)
                 {
-                    try
-                    {
-                        connection.Open();
-                        SQLiteCommand command = new SQLiteCommand(query, connection);
-                        SQLiteDataReader reader = command.ExecuteReader();
+                    // 8. Menemukan nama di basis data biodata yang sesuai dengan regex dan menampilkan biodatanya
+                    query = "SELECT nama FROM sidik_jari LIMIT 10";
+                    List<string> hasilQueryAlay = new List<string>();
 
-                        while (reader.Read())
+                    string regexedName = RegexMatcher.GetPattern(nameFound);
+                    bool foundAlay = false;
+                    string foundAlayName = "";
+
+                    using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                    {
+                        try
                         {
-                            string berkasCitraAlay = reader["nama"].ToString();
-                            hasilQueryAlay.Add(berkasCitraAlay); // Memasukkan data dari database ke hasilQuery
-                            Console.WriteLine(string.Format("berkas_citra: {0}", berkasCitra));
+                            connection.Open();
+                            SQLiteCommand command = new SQLiteCommand(query, connection);
+                            SQLiteDataReader reader = command.ExecuteReader();
+
+                            while (reader.Read())
+                            {
+                                string berkasCitraAlay = reader["nama"].ToString();
+                                hasilQueryAlay.Add(berkasCitraAlay); // Memasukkan data dari database ke hasilQuery
+                                Console.WriteLine(string.Format("berkas_citra: {0}", berkasCitraAlay));
+                            }
+
+                            reader.Close();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
+                            MessageBox.Show("Error Terjadi", ex.Message);
                         }
 
-                        reader.Close();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
-                        MessageBox.Show("Error Terjadi", ex.Message);
-                    }
-                }
+                        foreach (string alay in hasilQueryAlay)
+                        {
+                            if (isKMP)
+                            {
+                                KMP kmp = new KMP();
+                                if (kmp.KMPfunc(regexedName, alay))
+                                {
+                                    foundAlay = true;
+                                    foundAlayName = alay;
+                                    // Get biodata dari nama alay
+                                    query = "SELECT * FROM biodata WHERE nama=@foundAlayName";
+                                    using (SQLiteConnection sqliteConnection = new SQLiteConnection(connectionString))
+                                    {
+                                        try
+                                        {
+                                            connection.Open();
+                                            SQLiteCommand command = new SQLiteCommand(query, sqliteConnection);
+                                            command.Parameters.AddWithValue("@foundAlayName", foundAlayName);
 
-                string regexedName = RegexMatcher.GetPattern(nameFound);
-                bool foundAlay = false;
-                string foundAlayName = "";
+                                            // Menampilkan biodata di interface
 
-                for (string alay in hasilQueryAlay)
-                {
-                    if (isKMP)
+                                            // reader.Close();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
+                                            MessageBox.Show("Error Terjadi", ex.Message);
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                BoyerMoore bm = new BoyerMoore(regexedName, alay);
+                                if (bm.Search(alay))
+                                {
+                                    foundAlay = true;
+                                    foundAlayName = alay;
+                                    // Get biodata dari nama alay
+                                    query = "SELECT * FROM biodata WHERE nama=@foundAlayName";
+                                    using (SQLiteConnection sqliteConnection = new SQLiteConnection(connectionString))
+                                    {
+                                        try
+                                        {
+                                            connection.Open();
+                                            SQLiteCommand command = new SQLiteCommand(query, sqliteConnection);
+                                            command.Parameters.AddWithValue("@foundAlayName", foundAlayName);
+
+                                            // Menampilkan biodata di interface
+
+                                            // reader.Close();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
+                                            MessageBox.Show("Error Terjadi", ex.Message);
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // 9. Apabila masih belum ditemukan, gunakan algoritma levensthein
+                    if (!foundAlay)
                     {
-                        KMP kmp = new KMP();
-                        if (kmp.KMPfunc(regexedName, alay))
+                        double highestSimilarityAlay = 0;
+                        string mostSimilarAlay = null;
+
+                        for (int i = 0; i < hasilQueryAlay.Count; i++)
+                        {
+                            string alay = hasilQueryAlay[i];
+                            double similarity = Levenshtein.ComputeSimilarityPercentage(regexedName, alay);
+                            if (similarity > highestSimilarityAlay)
+                            {
+                                highestSimilarityAlay = similarity;
+                                mostSimilarAlay = alay;
+                            }
+                        }
+
+                        if (highestSimilarityAlay > 80) // Misalnya menggunakan batas 80 untuk kemiripan
                         {
                             foundAlay = true;
-                            foundAlayName = alay;
+                            foundAlayName = mostSimilarAlay;
                             // Get biodata dari nama alay
                             query = "SELECT * FROM biodata WHERE nama=@foundAlayName";
                             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -353,7 +431,7 @@ namespace Stime
 
                                     // Menampilkan biodata di interface
 
-                                    reader.Close();
+                                    // reader.Close();
                                 }
                                 catch (Exception ex)
                                 {
@@ -361,90 +439,15 @@ namespace Stime
                                     MessageBox.Show("Error Terjadi", ex.Message);
                                 }
                             }
-                            break;
                         }
-                    } 
-                    else
-                    {
-                        BoyerMoore bm = new BoyerMoore(regexedName, alay);
-                        if (bm.Search(alay))
+                        else
                         {
-                            foundAlay = true;
-                            foundAlayName = alay;
-                            // Get biodata dari nama alay
-                            query = "SELECT * FROM biodata WHERE nama=@foundAlayName";
-                            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-                            {
-                                try
-                                {
-                                    connection.Open();
-                                    SQLiteCommand command = new SQLiteCommand(query, connection);
-                                    command.Parameters.AddWithValue("@foundAlayName", foundAlayName);
 
-                                    // Menampilkan biodata di interface
-
-                                    reader.Close();
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
-                                    MessageBox.Show("Error Terjadi", ex.Message);
-                                }
-                            }
-                            break;
+                            MessageBox.Show("Tidak ada data yang cocok ditemukan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
+
                 }
-
-                // 9. Apabila masih belum ditemukan, gunakan algoritma levensthein
-                if (!foundAlay)
-                {
-                    double highestSimilarityAlay = 0;
-                    string mostSimilarAlay = null;
-
-                    for (int i = 0; i < hasilQueryAlay.Count; i++)
-                    {
-                        string alay = hasilQueryAlay[i];
-                        double similarity = Levenshtein.ComputeSimilarityPercentage(regexedName, alay);
-                        if (similarity > highestSimilarityAlay)
-                        {
-                            highestSimilarityAlay = similarity;
-                            mostSimilarAlay = alay;
-                        }
-                    }
-
-                    if (highestSimilarityAlay > 80) // Misalnya menggunakan batas 80 untuk kemiripan
-                    {
-                        foundAlay = true;
-                        foundAlayName = mostSimilarAlay;
-                        // Get biodata dari nama alay
-                        query = "SELECT * FROM biodata WHERE nama=@foundAlayName";
-                        using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-                        {
-                            try
-                            {
-                                connection.Open();
-                                SQLiteCommand command = new SQLiteCommand(query, connection);
-                                command.Parameters.AddWithValue("@foundAlayName", foundAlayName);
-
-                                // Menampilkan biodata di interface
-
-                                reader.Close();
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
-                                MessageBox.Show("Error Terjadi", ex.Message);
-                            }
-                        }
-                    }
-                    else
-                    {
-
-                        MessageBox.Show("Tidak ada data yang cocok ditemukan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                }
-
             }
             catch (Exception ex) {
                 MessageBox.Show("An error occurred: " + ex.Message);
@@ -801,46 +804,6 @@ namespace Stime
         // cara ngerun :
         // csc src\regex.cs
         // ./regex.exe
-        static void Main()
-        {
-            // Input string
-            string input = "Bintang Dwi Marthen"; // String dalam bentuk normal
-
-            //String dalam bentuk alay pake https://alaygenerator.blogspot.com/ buat nge generate, harusnya semuanya muncul di all matches found
-            string data = "13ntn6 DW1 m4rtH3n BNTAn6 Dw mrThn bnT4N6 Dw mrthN BNtNg dW mrth3n BNt4N6 dW mrthN bnTn6 dW Marthn bntng dwi mrthn bntng dW mRTh3n";
-
-            // Pattern to match
-            string pattern = GetPattern(input); // Generate Pattern
-            Console.WriteLine("pattern : " + pattern);
-
-            // Use Regex.Match to find the first match in the input string
-            Match match = Regex.Match(data, pattern);
-
-            // Check if a match is found
-            if (match.Success)
-            {
-                // Print the matched value
-                Console.WriteLine("First Match found: " + match.Value);
-            }
-            else
-            {
-                Console.WriteLine("No match found.");
-            }
-
-            // Use Regex.Matches to find all matches in the input string
-            MatchCollection matches = Regex.Matches(data, pattern);
-
-            // Print all matches found
-            Console.WriteLine("All matches found:");
-            int id = 1;
-            foreach (Match m in matches)
-            {
-                Console.WriteLine(id + "). " + m.Value);
-                id++;
-            }
-
-
-        }
         public static string GetPattern(string awal)
         {
             string pattern = @"\b"; // Start of word boundary
