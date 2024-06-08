@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Stime;
+using System.Data.SQLite;
 
 namespace Stime
 {
@@ -68,7 +69,7 @@ namespace Stime
                 if (string.IsNullOrEmpty(inputImagePath))
                 {
                     MessageBox.Show("Silakan pilih gambar terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return; // Menghentikan eksekusi lebih lanjut
+                    return;
                 }
 
                 // 1. Convert ke Binary 
@@ -93,10 +94,75 @@ namespace Stime
                     }
                 }
 
-                // Menampilkan Mode Pencarian
+                // 3. Memulai Pencarian
                 string modePencarian = isKMP ? "Knuth-Morris-Pratt" : "Boyer-Moore";
                 MessageBox.Show($"Mode pencarian yang dipilih: {modePencarian}", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+                string dbPath = "../../database/mydatabase.db";
+                string connectionString = $"Data Source={dbPath};";
+                string query = "SELECT * FROM sidik_jari LIMIT 10";
+
+                List<string> hasilQuery = new List<string>();
+
+                using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                {
+                    try
+                    {
+                        connection.Open();
+                        SQLiteCommand command = new SQLiteCommand(query, connection);
+                        SQLiteDataReader reader = command.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            string berkasCitra = reader["berkas_citra"].ToString();
+                            hasilQuery.Add(berkasCitra); // Memasukkan data dari database ke hasilQuery
+                            Console.WriteLine(string.Format("berkas_citra: {0}", berkasCitra));
+                        }
+
+                        reader.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
+                        MessageBox.Show("Error Terjadi", ex.Message);
+                    }
+                }
+
+                List<string> asciiStrings = BinaryToAscii(hasilQuery);
+
+                bool found = false;
+                foreach (string asciiString in asciiStrings)
+                {
+                    if (isKMP)
+                    {
+                        // Pencarian dengan KMP
+                        KMP kmp = new KMP();
+                        if (kmp.KMPfunc(binaryToAsciiResult[0], asciiString))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // Pencarian dengan BM
+                        BoyerMoore bm = new BoyerMoore(binaryToAsciiResult[0], asciiString);
+                        if (bm.Search(asciiString))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (found)
+                {
+                    MessageBox.Show("Sidik jari ditemukan di database.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Sidik jari tidak ditemukan di database.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
 
             }
             catch (Exception ex) {
