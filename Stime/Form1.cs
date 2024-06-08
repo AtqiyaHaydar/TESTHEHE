@@ -17,11 +17,10 @@ namespace Stime
     {
         private string inputFilePath = "";
         private string inputImagePath = "";
+        private Boolean isKMP = true; // switch mode
         
         private List<string> binaryStringList = new List<string>();
         private List<string> binaryToAsciiResult = new List<string>();
-
-        Boolean isInBMMode = true; // true jika mode BM, false jika mode KMP
 
         public Form1() {
             InitializeComponent();
@@ -52,17 +51,26 @@ namespace Stime
 
         // BM Mode Click
         private void BM_Click(object sender, EventArgs e) {
-
+            this.isKMP = false;
+            MessageBox.Show("Mode telah diubah ke Boyer-Moore", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         // KMP Mode Click
         private void KMP_Click(object sender, EventArgs e) {
-
+            this.isKMP = true;
+            MessageBox.Show("Mode telah diubah ke Knuth-Morris-Pratt", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         // Search Button
         private void searchButton_Click(object sender, EventArgs e) {
             try {
+                // Memeriksa apakah gambar sudah dipilih
+                if (string.IsNullOrEmpty(inputImagePath))
+                {
+                    MessageBox.Show("Silakan pilih gambar terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return; // Menghentikan eksekusi lebih lanjut
+                }
+
                 // 1. Convert ke Binary 
                 binaryStringList = ImageToBinaryParts(inputImagePath, 30);
                 
@@ -84,6 +92,11 @@ namespace Stime
                         writer.WriteLine(asciiString);
                     }
                 }
+
+                // Menampilkan Mode Pencarian
+                string modePencarian = isKMP ? "Knuth-Morris-Pratt" : "Boyer-Moore";
+                MessageBox.Show($"Mode pencarian yang dipilih: {modePencarian}", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
 
             }
             catch (Exception ex) {
