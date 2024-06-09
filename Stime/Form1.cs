@@ -100,7 +100,7 @@ namespace Stime
                 string modePencarian = isKMP ? "Knuth-Morris-Pratt" : "Boyer-Moore";
                 MessageBox.Show($"Mode pencarian yang dipilih: {modePencarian}", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                string dbPath = "../../database/mydatabase.db";
+                string dbPath = "../../database/database.db";
                 string connectionString = $"Data Source={dbPath};";
                 string query = "SELECT * FROM sidik_jari LIMIT 10";
 
@@ -166,27 +166,38 @@ namespace Stime
                                 if (kmp.KMPfunc(inputAscii, asciiString))
                                 {
                                     found = true;
-                                    // Mengganti Result Image menjadi gambar dari  hasilQuery[i]
+                                    // Mengganti Result Image menjadi gambar dari hasilQuery[i]
                                     string imagePath = Path.Combine("../../database", hasilQuery[i]);
                                     ResultImage.Image = Image.FromFile(imagePath);
                                     ResultImage.SizeMode = PictureBoxSizeMode.StretchImage;
+
                                     // Get nama dari pemilik sidik jari
-                                    query = "SELECT nama FROM sidik_jari WHERE berkas_citra=@asciiString";
+                                    string queryNama = "SELECT nama FROM sidik_jari WHERE berkas_citra=@berkas";
                                     using (SQLiteConnection connection = new SQLiteConnection(connectionString))
                                     {
                                         try
                                         {
                                             connection.Open();
-                                            SQLiteCommand command = new SQLiteCommand(query, connection);
-                                            command.Parameters.AddWithValue("@asciiString", asciiString);
+                                            SQLiteCommand command = new SQLiteCommand(queryNama, connection);
+                                            command.Parameters.AddWithValue("@berkas", hasilQuery[i]);
 
                                             SQLiteDataReader reader = command.ExecuteReader();
                                             
                                             while (reader.Read())
                                             {
                                                 nameFound = reader.GetString(0);
+
                                             }
-                                            
+
+                                            if (!string.IsNullOrEmpty(nameFound))
+                                            {
+                                                MessageBox.Show("Pemilik Sidik Jari: " + nameFound, "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                            }
+                                            else
+                                            {
+                                                MessageBox.Show("Nama pemilik sidik jari tidak ditemukan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                            }
+
                                             reader.Close();
                                         }
                                         catch (Exception ex)
@@ -208,15 +219,16 @@ namespace Stime
                                     string imagePath = Path.Combine("../../database", hasilQuery[i]);
                                     ResultImage.Image = Image.FromFile(imagePath);
                                     ResultImage.SizeMode = PictureBoxSizeMode.StretchImage;
+
                                     // Get nama dari pemilik sidik jari
-                                    query = "SELECT nama FROM sidik_jari WHERE berkas_citra=@asciiString";
+                                    string queryNama = "SELECT nama FROM sidik_jari WHERE berkas_citra=@berkas";
                                     using (SQLiteConnection connection = new SQLiteConnection(connectionString))
                                     {
                                         try
                                         {
                                             connection.Open();
-                                            SQLiteCommand command = new SQLiteCommand(query, connection);
-                                            command.Parameters.AddWithValue("@asciiString", asciiString);
+                                            SQLiteCommand command = new SQLiteCommand(queryNama, connection);
+                                            command.Parameters.AddWithValue("@berkas", hasilQuery[i]);
 
                                             SQLiteDataReader reader = command.ExecuteReader();
                                             
@@ -224,7 +236,15 @@ namespace Stime
                                             {
                                                 nameFound = reader.GetString(0);
                                             }
-                                            
+
+                                            if (!string.IsNullOrEmpty(nameFound))
+                                            {
+                                                MessageBox.Show("Pemilik Sidik Jari: " + nameFound, "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                            }
+                                            else
+                                            {
+                                                MessageBox.Show("Nama pemilik sidik jari tidak ditemukan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                            }
 
                                             reader.Close();
                                         }
@@ -310,7 +330,7 @@ namespace Stime
                     MessageBox.Show("Sidik jari tidak ditemukan di database.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
-                
+                found = false; // TEMP
                 if (found)
                 {
                     // 8. Menemukan nama di basis data biodata yang sesuai dengan regex dan menampilkan biodatanya
