@@ -102,7 +102,7 @@ namespace Stime
 
                 string dbPath = "../../database/database.db";
                 string connectionString = $"Data Source={dbPath};";
-                string query = "SELECT * FROM sidik_jari LIMIT 250";
+                string query = "SELECT * FROM sidik_jari LIMIT 100";
 
                 List<string> hasilQuery = new List<string>();
 
@@ -118,7 +118,7 @@ namespace Stime
                         {
                             string berkasCitra = reader["berkas_citra"].ToString();
                             hasilQuery.Add(berkasCitra); // Memasukkan data dari database ke hasilQuery
-                            Console.WriteLine(string.Format("berkas_citra: {0}", berkasCitra));
+                            Console.WriteLine(berkasCitra);
                         }
 
                         reader.Close();
@@ -347,7 +347,7 @@ namespace Stime
                 if (found)
                 {
                     // 8. Menemukan nama di basis data biodata yang sesuai dengan regex dan menampilkan biodatanya
-                    query = "SELECT nama FROM biodata LIMIT 250";
+                    query = "SELECT nama FROM biodata LIMIT 100";
                     List<string> hasilQueryAlay = new List<string>();
 
                     string regexedName = RegexMatcher.GenerateAlayString(nameFound);
