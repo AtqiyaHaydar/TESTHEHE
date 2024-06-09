@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Text;
 using MySql.Data.MySqlClient;
 using System.Data.SQLite;
 using System.Collections.Generic;
@@ -11,12 +12,8 @@ class Program
 {
     static void Main(string[] args)
     {
-
-        // // string query = "SELECT * FROM sidik_jari LIMIT 10";
-        // string dbPath = "database.db";
-
-        // // Connection string for SQLite
-        // string connectionString = $"Data Source={dbPath};";
+        string dbPath = "database.db";
+        string connectionString = $"Data Source={dbPath};";
 
         // string createTableQuery = @"
         //     CREATE TABLE sidik_jari (
@@ -25,11 +22,27 @@ class Program
         //     );
         // ";
 
+        // string createTableBiodataQuery = @"
+        //     CREATE TABLE biodata (
+        //     nik varchar(16) PRIMARY KEY NOT NULL,
+        //     nama varchar(100) DEFAULT NULL,
+        //     tempat_lahir varchar(50) DEFAULT NULL,
+        //     tanggal_lahir date DEFAULT NULL,
+        //     jenis_kelamin TEXT DEFAULT NULL,
+        //     golongan_darah varchar(5) DEFAULT NULL,
+        //     alamat varchar(255) DEFAULT NULL,
+        //     agama varchar(50) DEFAULT NULL,
+        //     status_perkawinan TEXT DEFAULT NULL,
+        //     pekerjaan varchar(100) DEFAULT NULL,
+        //     kewarganegaraan varchar(50) DEFAULT NULL
+        //     );
+        // ";
+
         // using (SQLiteConnection connection = new SQLiteConnection(connectionString))
         // {
         //     connection.Open();
 
-        //     using (SQLiteCommand command = new SQLiteCommand(createTableQuery, connection))
+        //     using (SQLiteCommand command = new SQLiteCommand(createTableBiodataQuery, connection))
         //     {
         //         command.ExecuteNonQuery();
         //     }
@@ -40,25 +53,63 @@ class Program
         // Buat data palsu
         // List<string> fakeSidikJari = GenerateFakeSidikJariData(6000);
         // List<string> filepath = GetFilePaths("./assets");
-        List<string> fakeNIK = GenerateFakeNIKData(10);
-        List<string> fakeTempatLahir = GenerateFakeTempatLahirData(10);
-        List<string> fakeTanggalLahir = GenerateFakeTanggalLahirData(10);
-        List<string> fakeGender = GenerateFakeGenderData(10);
-        List<string> fakeBloodType = GenerateFakeBloodTypeData(10);
-        List<string> fakeAlamat = GenerateFakeAlamatData(10);
-        List<string> fakeAgama = GenerateFakeAgamaData(10);
-        List<string> fakeStatusPerkawinan = GenerateFakeStatusPerkawinanData(10);
-        List<string> fakePekerjaan = GenerateFakePekerjaanData(10);
-        List<string> fakeKewarganegaraan = GenerateFakeKewarganegaraanData(10);
+        // List<string> fakeNIK = GenerateFakeNIKData(6000);
+        // List<string> fakeTempatLahir = GenerateFakeTempatLahirData(6000);
+        // List<DateTime> fakeTanggalLahir = GenerateFakeTanggalLahirData(6000);
+        // List<string> fakeGender = GenerateFakeGenderData(6000);
+        // List<string> fakeBloodType = GenerateFakeBloodTypeData(6000);
+        // List<string> fakeAlamat = GenerateFakeAlamatData(6000);
+        // List<string> fakeAgama = GenerateFakeAgamaData(6000);
+        // List<string> fakeStatusPerkawinan = GenerateFakeStatusPerkawinanData(6000);
+        // List<string> fakePekerjaan = GenerateFakePekerjaanData(6000);
+        // List<string> fakeKewarganegaraan = GenerateFakeKewarganegaraanData(6000);
 
+        // List<string> namaFromSidikJari = GetNamaFromSidikJari(connectionString);
+
+        // List<string> namaRegexed = new List<string>();
+        // foreach (string nama in namaFromSidikJari)
+        // {
+        //     namaRegexed.Add(RegexMatcher.GenerateAlayString(nama));
+        // }
+
+        // // Insert data palsu ke dalam database
+        // InsertBiodataIntoDatabase(connectionString, fakeNIK, namaRegexed, fakeTempatLahir, fakeTanggalLahir, fakeGender, fakeBloodType, fakeAlamat, fakeAgama, fakeStatusPerkawinan, fakePekerjaan, fakeKewarganegaraan);
         // // Masukkan data palsu ke dalam database
         // InsertDataIntoDatabase(connectionString, filepath, fakeSidikJari);
 
         // // Query database untuk melihat data yang dimasukkan
-        // QueryDatabase(connectionString, "SELECT * FROM sidik_jari LIMIT 10");
+        QueryBiodataDatabase(connectionString);
 
     }
     
+    static List<string> GetNamaFromSidikJari(string connectionString)
+    {
+        List<string> namaList = new List<string>();
+
+        using (SQLiteConnection conn = new SQLiteConnection(connectionString))
+        {
+            conn.Open();
+            string query = "SELECT nama FROM sidik_jari";
+
+            using (SQLiteCommand cmd = new SQLiteCommand(query, conn))
+            {
+                using (SQLiteDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        // Pastikan nama tidak null sebelum menambahkannya ke list
+                        if (!reader.IsDBNull(0))
+                        {
+                            string nama = reader.GetString(0);
+                            namaList.Add(nama);
+                        }
+                    }
+                }
+            }
+        }
+
+        return namaList;
+    }
     static List<string> GenerateFakeSidikJariData(int numberOfRecords)
     {
         var faker = new Bogus.Faker("id_ID");
@@ -115,21 +166,21 @@ class Program
         return fakeDataList;
     }
 
-    static List<string> GenerateFakeTanggalLahirData(int numberOfRecords)
+static List<DateTime> GenerateFakeTanggalLahirData(int numberOfRecords)
+{
+    var faker = new Bogus.Faker("id_ID");
+    var fakeDataList = new List<DateTime>();
+
+    for (int i = 0; i < numberOfRecords; i++)
     {
-        var faker = new Bogus.Faker("id_ID");
-        var fakeDataList = new List<string>();
-
-        for (int i = 0; i < numberOfRecords; i++)
-        {
-            // Generate random date of birth within a reasonable range
-            var tanggalLahirWithTime = faker.Date.Between(DateTime.Now.AddYears(-80), DateTime.Now.AddYears(-18)); // Generate date of birth between 18 and 80 years ago
-            var tanggalLahir = tanggalLahirWithTime.ToString("yyyy-MM-dd"); // Format date to yyyy-MM-dd
-            fakeDataList.Add(tanggalLahir);
-        }
-
-        return fakeDataList;
+        // Generate random date of birth within a reasonable range
+        DateTime randomDate = faker.Date.Between(DateTime.Now.AddYears(-80), DateTime.Now.AddYears(-18)); // Generate random date within the last 80 years
+        // var tanggalLahir = faker.Date.Between(DateTime.Now.AddYears(-80), DateTime.Now.AddYears(-18)).Date; // Only keep the date part
+        fakeDataList.Add(randomDate);
     }
+
+    return fakeDataList;
+}
 
     static List<string> GenerateFakeGenderData(int numberOfRecords)
     {
@@ -285,27 +336,58 @@ class Program
         }
     }
 
+    static void QueryBiodataDatabase(string connectionString)
+    {
+        using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+        {
+            connection.Open();
+            string query = "SELECT * FROM biodata LIMIT 10 ";
+
+            using (SQLiteCommand command = new SQLiteCommand(query, connection))
+            {
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Console.WriteLine("NIK: {0}, Nama: {1}, Tempat Lahir: {2}, Tanggal Lahir: {3}, Jenis Kelamin: {4}, Golongan Darah: {5}, Alamat: {6}, Agama: {7}, Status Perkawinan: {8}, Pekerjaan: {9}, Kewarganegaraan: {10}",
+                            reader["nik"], 
+                            reader["nama"], 
+                            reader["tempat_lahir"], 
+                            reader["tanggal_lahir"], 
+                            reader["jenis_kelamin"], 
+                            reader["golongan_darah"], 
+                            reader["alamat"], 
+                            reader["agama"], 
+                            reader["status_perkawinan"], 
+                            reader["pekerjaan"], 
+                            reader["kewarganegaraan"]);
+                    }
+                }
+            }
+        }
+    }
+
    
     // Function to get all file paths in a folder
-        static List<string> GetFilePaths(string folderPath)
+    static List<string> GetFilePaths(string folderPath)
+    {
+        List<string> filePaths = new List<string>();
+
+        // Get all files in the folder
+        string[] files = Directory.GetFiles(folderPath);
+
+        // Add each file path to the list
+        foreach (string file in files)
         {
-            List<string> filePaths = new List<string>();
-
-            // Get all files in the folder
-            string[] files = Directory.GetFiles(folderPath);
-
-            // Add each file path to the list
-            foreach (string file in files)
-            {
-                filePaths.Add(file);
-                // Console.WriteLine(file);
-            }
-
-            return filePaths;
+            filePaths.Add(file);
+            // Console.WriteLine(file);
         }
 
+        return filePaths;
+    }
+
         // Function to insert file paths into the database using looping
-        static void InsertDataIntoDatabase(string connectionString, List<string> filePaths, List<string> fakeSidikJari)
+    static void InsertDataIntoDatabase(string connectionString, List<string> filePaths, List<string> fakeSidikJari)
     {
         using (SQLiteConnection conn = new SQLiteConnection(connectionString))
         {
@@ -356,5 +438,312 @@ class Program
                 Console.WriteLine("Connection to database closed.");
             }
         }
+    }
+
+    static void InsertBiodataIntoDatabase(string connectionString, List<string> fakeNIK, List<string> namaRegexed, List<string> fakeTempatLahir, List<DateTime> fakeTanggalLahir, List<string> fakeGender, List<string> fakeBloodType, List<string> fakeAlamat, List<string> fakeAgama, List<string> fakeStatusPerkawinan, List<string> fakePekerjaan, List<string> fakeKewarganegaraan)
+{
+    using (SQLiteConnection conn = new SQLiteConnection(connectionString))
+    {
+        try
+        {
+            // Open the connection
+            conn.Open();
+            Console.WriteLine("Connection to database established successfully.");
+
+            // Find the minimum length of all lists
+            int minCount = Math.Min(fakeNIK.Count, 
+                            Math.Min(namaRegexed.Count, 
+                            Math.Min(fakeTempatLahir.Count, 
+                            Math.Min(fakeTanggalLahir.Count, 
+                            Math.Min(fakeGender.Count, 
+                            Math.Min(fakeBloodType.Count, 
+                            Math.Min(fakeAlamat.Count, 
+                            Math.Min(fakeAgama.Count, 
+                            Math.Min(fakeStatusPerkawinan.Count, 
+                            Math.Min(fakePekerjaan.Count, fakeKewarganegaraan.Count))))))))));
+
+            for (int i = 0; i < minCount; i++)
+            {
+                string NIK = fakeNIK[i];
+                string Regexed = namaRegexed[i];
+                string TempatLahir = fakeTempatLahir[i];
+                DateTime TanggalLahir = fakeTanggalLahir[i];
+                string Gender = fakeGender[i];
+                string BloodType = fakeBloodType[i];
+                string Alamat = fakeAlamat[i];
+                string Agama = fakeAgama[i];
+                string StatusPerkawinan = fakeStatusPerkawinan[i];
+                string Pekerjaan = fakePekerjaan[i];
+                string Kewarganegaraan = fakeKewarganegaraan[i];
+
+                // Prepare the SQL query
+                string query = "INSERT INTO biodata (nik, nama, tempat_lahir, tanggal_lahir, jenis_kelamin, golongan_darah, alamat, agama, status_perkawinan, pekerjaan, kewarganegaraan) VALUES (@NIK, @Regexed, @TempatLahir, @TanggalLahir, @Gender, @BloodType, @Alamat, @Agama, @StatusPerkawinan, @Pekerjaan, @Kewarganegaraan)";
+
+                using (SQLiteCommand cmd = new SQLiteCommand(query, conn))
+                {
+                    // Adding parameters to prevent SQL injection
+                    cmd.Parameters.AddWithValue("@NIK", NIK);
+                    cmd.Parameters.AddWithValue("@Regexed", Regexed);
+                    cmd.Parameters.AddWithValue("@TempatLahir", TempatLahir);
+                    cmd.Parameters.AddWithValue("@TanggalLahir", TanggalLahir.ToString("yyyy-MM-dd")); // Ensure date format
+                    cmd.Parameters.AddWithValue("@Gender", Gender);
+                    cmd.Parameters.AddWithValue("@BloodType", BloodType);
+                    cmd.Parameters.AddWithValue("@Alamat", Alamat);
+                    cmd.Parameters.AddWithValue("@Agama", Agama);
+                    cmd.Parameters.AddWithValue("@StatusPerkawinan", StatusPerkawinan);
+                    cmd.Parameters.AddWithValue("@Pekerjaan", Pekerjaan);
+                    cmd.Parameters.AddWithValue("@Kewarganegaraan", Kewarganegaraan);
+
+                    // Execute the query
+                    int result = cmd.ExecuteNonQuery();
+
+                    // Optional: Print success message
+                    if (result > 0)
+                    {
+                        Console.WriteLine($"Record for '{Regexed}' inserted successfully.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Failed to insert record for '{Regexed}'.");
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle any errors
+            Console.WriteLine("An error occurred: " + ex.Message);
+        }
+        finally
+        {
+            // Close the connection
+            conn.Close();
+            Console.WriteLine("Connection to database closed.");
+        }
+    }
+}
+
+}
+
+public class RegexMatcher
+{
+    // cara ngerun :
+    // csc src\regex.cs
+    // ./regex.exe
+    public static string GetPattern(string awal)
+    {
+        string pattern = @"\b"; // Start of word boundary
+        foreach (char c_awal in awal)
+        {
+            bool matchFound = false; // Flag to track if a match is found
+
+            // Lowercase loop
+            for (char c = 'a'; c <= 'z'; c++)
+            {
+                if (c_awal == c)
+                {
+                    matchFound = true; // Set matchFound to true
+                    pattern += "([" + c + char.ToUpper(c); // Match lowercase or uppercase of the character
+                    switch (c)
+                    {
+                        case 'a':
+                            pattern += "4])?";
+                            break;
+                        case 'b':
+                            pattern += "]|[1][3])";
+                            break;
+                        case 'd':
+                            pattern += "]|[1][7])";
+                            break;
+                        case 'e':
+                            pattern += "3])?";
+                            break;
+                        case 'g':
+                            pattern += "6])";
+                            break;
+                        case 'i':
+                            pattern += "1])?";
+                            break;
+                        case 'o':
+                            pattern += "0])?";
+                            break;
+                        case 'r':
+                            pattern += "]|[1][2])";
+                            break;
+                        case 's':
+                            pattern += "5])";
+                            break;
+                        case 'u':
+                            pattern += "])?";
+                            break;
+                        case 'z':
+                            pattern += "2])";
+                            break;
+                        default:
+                            pattern += "])";
+                            break;
+                    }
+                    //pattern += "?";
+                    break; // Exit the lowercase loop
+                }
+            }
+
+
+
+            // Uppercase loop
+            for (char c = 'A'; c <= 'Z'; c++)
+            {
+                if (matchFound) // Check if a match is found in the lowercase loop
+                {
+                    break;
+                }
+                if (c_awal == c)
+                {
+                    matchFound = true;
+                    pattern += "([" + c + char.ToLower(c); // Match uppercase or lowercase of the character
+                    switch (c)
+                    {
+                        case 'A':
+                            pattern += "4])";
+                            break;
+                        case 'B':
+                            pattern += "]|[1][3])";
+                            break;
+                        case 'D':
+                            pattern += "]|[1][7])";
+                            break;
+                        case 'E':
+                            pattern += "3])";
+                            break;
+                        case 'G':
+                            pattern += "6])";
+                            break;
+                        case 'O':
+                            pattern += "0])?";
+                            break;
+                        case 'I':
+                            pattern += "1])";
+                            break;
+                        case 'R':
+                            pattern += "]|[1][2])";
+                            break;
+                        case 'S':
+                            pattern += "5])";
+                            break;
+                        case 'U':
+                            pattern += "])?";
+                            break;
+                        case 'Z':
+                            pattern += "2])";
+                            break;
+                        default:
+                            pattern += "])";
+                            break;
+                    }
+                    //pattern += "?";
+                    break; // Exit the uppercase loop
+
+                }
+            }
+            if (!matchFound)
+            {
+                pattern += c_awal;
+            }
+        }
+
+        pattern += @"\b"; // End of word boundary
+
+        return pattern;
+    }
+
+    public static string GenerateAlayString(string input)
+    {
+        Random random = new Random();
+        StringBuilder result = new StringBuilder();
+
+        foreach (char c in input)
+        {
+            if (char.IsLetter(c))
+            {
+                // Mengonversi huruf menjadi kombinasi huruf besar dan kecil
+                char convertedChar = random.Next(0, 2) == 0 ? char.ToLower(c) : char.ToUpper(c);
+                result.Append(convertedChar);
+            }
+            else
+            {
+                result.Append(c);
+            }
+        }
+
+        string tempResult = result.ToString();
+        result.Clear();
+
+        foreach (char c in tempResult)
+        {
+            // Mengonversi huruf menjadi angka
+            switch (char.ToLower(c))
+            {
+                case 'a':
+                    result.Append('4');
+                    break;
+                case 'e':
+                    result.Append('3');
+                    break;
+                case 'i':
+                    result.Append('1');
+                    break;
+                case 'o':
+                    result.Append('0');
+                    break;
+                case 's':
+                    result.Append('5');
+                    break;
+                case 'g':
+                    result.Append('6');
+                    break;
+                case 'b':
+                    result.Append('8');
+                    break;
+                default:
+                    result.Append(c);
+                    break;
+            }
+        }
+
+        // Menyingkat kata-kata dengan menghilangkan huruf vokal
+        string shortenedResult = ShortenWords(result.ToString());
+
+        return shortenedResult;
+    }
+
+    static string ShortenWords(string input)
+    {
+        StringBuilder result = new StringBuilder();
+        bool previousWasVowel = false;
+
+        foreach (char c in input)
+        {
+            if (IsVowel(c))
+            {
+                if (!previousWasVowel)
+                {
+                    result.Append(c);
+                    previousWasVowel = true;
+                }
+            }
+            else
+            {
+                result.Append(c);
+                previousWasVowel = false;
+            }
+        }
+
+        return result.ToString();
+    }
+
+    static bool IsVowel(char c)
+    {
+        char lower = char.ToLower(c);
+        return lower == 'a' || lower == 'e' || lower == 'i' || lower == 'o' || lower == 'u';
     }
 }
