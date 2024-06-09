@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using Stime;
 using System.Data.SQLite;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace Stime
 {
@@ -67,6 +68,9 @@ namespace Stime
         // Search Button
         private void searchButton_Click(object sender, EventArgs e) {
             try {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
                 // Memeriksa apakah gambar sudah dipilih
                 if (string.IsNullOrEmpty(inputImagePath))
                 {
@@ -626,6 +630,13 @@ namespace Stime
                     }
 
                 }
+
+                stopwatch.Stop();
+                TimeSpan ts = stopwatch.Elapsed;
+
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+
+                MessageBox.Show("Waktu eksekusi: " + elapsedTime);
             }
             catch (Exception ex) {
                 MessageBox.Show("An error occurred: " + ex.Message);
