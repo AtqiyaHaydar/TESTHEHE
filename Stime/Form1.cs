@@ -418,18 +418,7 @@ namespace Stime
                                                     string kewarganegaraan = reader["kewarganegaraan"].ToString();
 
                                                     // Tampilkan data di antarmuka pengguna
-                                                    txtBiodata.Text = $"NIK: {nik}\r\n" +
-                                                                      $"Nama: {nama}\r\n" +
-                                                                      $"Nama Alay: {namaAlay}\r\n" +
-                                                                      $"Tempat Lahir: {tempatLahir}\r\n" +
-                                                                      $"Tanggal Lahir: {tanggalLahir}\r\n" +
-                                                                      $"Jenis Kelamin: {jenisKelamin}\r\n" +
-                                                                      $"Golongan Darah: {golonganDarah}\r\n" +
-                                                                      $"Alamat: {alamat}\r\n" +
-                                                                      $"Agama: {agama}\r\n" +
-                                                                      $"Status Perkawinan: {statusPerkawinan}\r\n" +
-                                                                      $"Pekerjaan: {pekerjaan}\r\n" +
-                                                                      $"Kewarganegaraan: {kewarganegaraan}\r\n";
+                                            
 
                                                     string biodataMessage = $"NIK: {nik}\r\n" +
                                                                             $"Nama: {nama}\r\n" +
@@ -446,6 +435,7 @@ namespace Stime
 
                                                     // Tampilkan hasil biodata dalam MessageBox
                                                     MessageBox.Show(biodataMessage, "Hasil Biodata", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                                    ListBiodatas.Text = biodataMessage;
                                                 }
                                                 else
                                                 {
@@ -500,18 +490,7 @@ namespace Stime
                                                     string kewarganegaraan = reader["kewarganegaraan"].ToString();
 
                                                     // Tampilkan data di antarmuka pengguna
-                                                    txtBiodata.Text = $"NIK: {nik}\r\n" +
-                                                                      $"Nama: {nama}\r\n" +
-                                                                      $"Nama Alay: {namaAlay}\r\n" +
-                                                                      $"Tempat Lahir: {tempatLahir}\r\n" +
-                                                                      $"Tanggal Lahir: {tanggalLahir}\r\n" +
-                                                                      $"Jenis Kelamin: {jenisKelamin}\r\n" +
-                                                                      $"Golongan Darah: {golonganDarah}\r\n" +
-                                                                      $"Alamat: {alamat}\r\n" +
-                                                                      $"Agama: {agama}\r\n" +
-                                                                      $"Status Perkawinan: {statusPerkawinan}\r\n" +
-                                                                      $"Pekerjaan: {pekerjaan}\r\n" +
-                                                                      $"Kewarganegaraan: {kewarganegaraan}\r\n";
+                                                  
 
                                                     // Menampilkan data di antarmuka pengguna
                                                     string biodataMessage = $"NIK: {nik}\r\n" +
@@ -529,6 +508,7 @@ namespace Stime
 
                                                     // Tampilkan hasil biodata dalam MessageBox
                                                     MessageBox.Show(biodataMessage, "Hasil Biodata", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                                    ListBiodatas.Text = biodataMessage;
                                                 }
                                                 else
                                                 {
