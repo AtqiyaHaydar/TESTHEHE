@@ -20,7 +20,7 @@ namespace Stime
         TextBox txtBiodata;
         private string inputFilePath = "";
         private string inputImagePath = "";
-        private Boolean isKMP = true; // switch mode
+        private Boolean isKMP = true;
         
         private List<string> binaryStringList = new List<string>();
         private List<string> binaryToAsciiResult = new List<string>();
@@ -166,6 +166,7 @@ namespace Stime
                                 if (kmp.KMPfunc(inputAscii, asciiString))
                                 {
                                     found = true;
+
                                     // Mengganti Result Image menjadi gambar dari hasilQuery[i]
                                     string imagePath = Path.Combine("../../database", hasilQuery[i]);
                                     ResultImage.Image = Image.FromFile(imagePath);
@@ -215,6 +216,7 @@ namespace Stime
                                 if (bm.Search(asciiString))
                                 {
                                     found = true;
+
                                     // Mengganti Result Image menjadi gambar dari  hasilQuery[i]
                                     string imagePath = Path.Combine("../../database", hasilQuery[i]);
                                     ResultImage.Image = Image.FromFile(imagePath);
@@ -287,7 +289,6 @@ namespace Stime
                             }
                         }
                     }
-
 
                     if (mostSimilarResult != null)
                     {
@@ -387,8 +388,6 @@ namespace Stime
                                     foundAlay = true;
                                     foundAlayName = alay;
 
-                                    MessageBox.Show("Found Alay Name: " + foundAlayName);
-
                                     // Get biodata dari nama alay
                                     query = "SELECT * FROM biodata WHERE nama=@foundAlayName";
                                     using (SQLiteConnection sqliteConnection = new SQLiteConnection(connectionString))
@@ -405,9 +404,9 @@ namespace Stime
                                             {
                                                 if (reader.Read())
                                                 {
-                                                    // Baca data dari reader
                                                     string nik = reader["nik"].ToString();
-                                                    string nama = reader["nama"].ToString();
+                                                    string nama = nameFound;
+                                                    string namaAlay = reader["nama"].ToString();
                                                     string tempatLahir = reader["tempat_lahir"].ToString();
                                                     string tanggalLahir = reader["tanggal_lahir"].ToString();
                                                     string jenisKelamin = reader["jenis_kelamin"].ToString();
@@ -421,6 +420,7 @@ namespace Stime
                                                     // Tampilkan data di antarmuka pengguna
                                                     txtBiodata.Text = $"NIK: {nik}\r\n" +
                                                                       $"Nama: {nama}\r\n" +
+                                                                      $"Nama Alay: {namaAlay}\r\n" +
                                                                       $"Tempat Lahir: {tempatLahir}\r\n" +
                                                                       $"Tanggal Lahir: {tanggalLahir}\r\n" +
                                                                       $"Jenis Kelamin: {jenisKelamin}\r\n" +
@@ -431,9 +431,9 @@ namespace Stime
                                                                       $"Pekerjaan: {pekerjaan}\r\n" +
                                                                       $"Kewarganegaraan: {kewarganegaraan}\r\n";
 
-                                                    // Menampilkan data di antarmuka pengguna
                                                     string biodataMessage = $"NIK: {nik}\r\n" +
                                                                             $"Nama: {nama}\r\n" +
+                                                                            $"Nama Alay: {namaAlay}\r\n" +
                                                                             $"Tempat Lahir: {tempatLahir}\r\n" +
                                                                             $"Tanggal Lahir: {tanggalLahir}\r\n" +
                                                                             $"Jenis Kelamin: {jenisKelamin}\r\n" +
@@ -449,7 +449,6 @@ namespace Stime
                                                 }
                                                 else
                                                 {
-                                                    // Jika data tidak ditemukan
                                                     MessageBox.Show("Data tidak ditemukan");
                                                 }
                                             }
@@ -487,9 +486,9 @@ namespace Stime
                                             {
                                                 if (reader.Read())
                                                 {
-                                                    // Baca data dari reader
                                                     string nik = reader["nik"].ToString();
-                                                    string nama = reader["nama"].ToString();
+                                                    string nama = nameFound;
+                                                    string namaAlay = reader["nama"].ToString();
                                                     string tempatLahir = reader["tempat_lahir"].ToString();
                                                     string tanggalLahir = reader["tanggal_lahir"].ToString();
                                                     string jenisKelamin = reader["jenis_kelamin"].ToString();
@@ -503,6 +502,7 @@ namespace Stime
                                                     // Tampilkan data di antarmuka pengguna
                                                     txtBiodata.Text = $"NIK: {nik}\r\n" +
                                                                       $"Nama: {nama}\r\n" +
+                                                                      $"Nama Alay: {namaAlay}\r\n" +
                                                                       $"Tempat Lahir: {tempatLahir}\r\n" +
                                                                       $"Tanggal Lahir: {tanggalLahir}\r\n" +
                                                                       $"Jenis Kelamin: {jenisKelamin}\r\n" +
@@ -516,6 +516,7 @@ namespace Stime
                                                     // Menampilkan data di antarmuka pengguna
                                                     string biodataMessage = $"NIK: {nik}\r\n" +
                                                                             $"Nama: {nama}\r\n" +
+                                                                            $"Nama Alay: {namaAlay}\r\n" +
                                                                             $"Tempat Lahir: {tempatLahir}\r\n" +
                                                                             $"Tanggal Lahir: {tanggalLahir}\r\n" +
                                                                             $"Jenis Kelamin: {jenisKelamin}\r\n" +
@@ -531,7 +532,6 @@ namespace Stime
                                                 }
                                                 else
                                                 {
-                                                    // Jika data tidak ditemukan
                                                     MessageBox.Show("Data tidak ditemukan");
                                                 }
                                             }
@@ -551,7 +551,6 @@ namespace Stime
                     // 9. Apabila masih belum ditemukan, gunakan algoritma levensthein
                     if (!foundAlay)
                     {
-                        MessageBox.Show("Mencari biodata pemilik sidik jari dengan Levensthein");
                         double highestSimilarityAlay = 0;
                         string mostSimilarAlay = null;
 
@@ -570,6 +569,7 @@ namespace Stime
                         {
                             foundAlay = true;
                             foundAlayName = mostSimilarAlay;
+
                             // Get biodata dari nama alay
                             query = "SELECT * FROM biodata WHERE nama=@foundAlayName";
                             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -587,8 +587,10 @@ namespace Stime
                                         if (reader.Read())
                                         {
                                             // Baca data dari reader
+                                            double kemiripan = highestSimilarityAlay;
                                             string nik = reader["nik"].ToString();
                                             string nama = nameFound;
+                                            string namaAlay = reader["nama"].ToString();
                                             string tempatLahir = reader["tempat_lahir"].ToString();
                                             string tanggalLahir = reader["tanggal_lahir"].ToString();
                                             string jenisKelamin = reader["jenis_kelamin"].ToString();
@@ -603,8 +605,10 @@ namespace Stime
                                             
 
                                             // Menampilkan data di antarmuka pengguna
-                                            string biodataMessage = $"NIK: {nik}\r\n" +
+                                            string biodataMessage = $"Kemiripan Levensthein: {kemiripan.ToString()}\r\n" +
+                                                                    $"NIK: {nik}\r\n" +
                                                                     $"Nama: {nama}\r\n" +
+                                                                    $"Nama Alay: {namaAlay}\r\n" +
                                                                     $"Tempat Lahir: {tempatLahir}\r\n" +
                                                                     $"Tanggal Lahir: {tanggalLahir}\r\n" +
                                                                     $"Jenis Kelamin: {jenisKelamin}\r\n" +
