@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Stime;
 using System.Data.SQLite;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Stime
 {
     public partial class Form1 : Form
     {
+        TextBox txtBiodata;
         private string inputFilePath = "";
         private string inputImagePath = "";
         private Boolean isKMP = true; // switch mode
@@ -264,6 +264,7 @@ namespace Stime
                 }
 
                 // 7. Apabila belum menemukan, akan menggunakan Levensthein Distance dan dipilih hasil Rarity kesamaan yang terbesar
+                string pathResultLeven = "";
                 if (!found)
                 {
                     for (int i = 0; i < hasilAscii.Count; i++)
@@ -275,12 +276,13 @@ namespace Stime
                             {
                                 string asciiString = ascii[j];
                                 string inputAscii = binaryToAsciiResult[j];
-
+                
                                 double similarity = Levenshtein.ComputeSimilarityPercentage(inputAscii, asciiString);
                                 if (similarity >= 80 && similarity > highestSimilarity)
                                 {
                                     highestSimilarity = similarity;
                                     mostSimilarResult = asciiString;
+                                    pathResultLeven = hasilQuery[i];
                                 }
                             }
                         }
@@ -289,14 +291,14 @@ namespace Stime
 
                     if (mostSimilarResult != null)
                     {
-                        query = "SELECT berkas_citra FROM sidik_jari WHERE nama=@nama";
+                        query = "SELECT berkas_citra FROM sidik_jari WHERE berkas_citra=@berkas";
                         using (SQLiteConnection connection = new SQLiteConnection(connectionString))
                         {
                             try
                             {
                                 connection.Open();
                                 SQLiteCommand command = new SQLiteCommand(query, connection);
-                                command.Parameters.AddWithValue("@nama", mostSimilarResult);
+                                command.Parameters.AddWithValue("@berkas", pathResultLeven);
 
                                 SQLiteDataReader reader = command.ExecuteReader();
 
@@ -323,19 +325,17 @@ namespace Stime
                     }
                     else
                     {
-                        MessageBox.Show("Tidak ada citra yang cocok.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Tidak ada citra yang cocok menggunakan Levensthein.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
 
-                // bool levenstheinFound = false;
                 if (found)
                 {
                     MessageBox.Show("Sidik jari ditemukan di database.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                else if (highestSimilarity > 80) // Jelasin di laporan mengapa menggunakan batas 80
+                else if (highestSimilarity > 80)
                 {
                     MessageBox.Show($"Sidik jari tidak ditemukan secara eksak di database. Hasil yang paling mirip memiliki kemiripan {highestSimilarity:F2}%.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    // levenstheinFound = true;
                     found = true;
                 }
                 else
@@ -343,14 +343,14 @@ namespace Stime
                     MessageBox.Show("Sidik jari tidak ditemukan di database.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
-                found = false; // TEMP
                 if (found)
                 {
                     // 8. Menemukan nama di basis data biodata yang sesuai dengan regex dan menampilkan biodatanya
-                    query = "SELECT nama FROM sidik_jari LIMIT 10";
+                    query = "SELECT nama FROM biodata LIMIT 120";
                     List<string> hasilQueryAlay = new List<string>();
 
                     string regexedName = RegexMatcher.GenerateAlayString(nameFound);
+                    MessageBox.Show("Nama Alay: " + regexedName);
                     bool foundAlay = false;
                     string foundAlayName = "";
 
@@ -386,6 +386,9 @@ namespace Stime
                                 {
                                     foundAlay = true;
                                     foundAlayName = alay;
+
+                                    MessageBox.Show("Found Alay Name: " + foundAlayName);
+
                                     // Get biodata dari nama alay
                                     query = "SELECT * FROM biodata WHERE nama=@foundAlayName";
                                     using (SQLiteConnection sqliteConnection = new SQLiteConnection(connectionString))
@@ -397,8 +400,59 @@ namespace Stime
                                             command.Parameters.AddWithValue("@foundAlayName", foundAlayName);
 
                                             // Menampilkan biodata di interface
+                                            MessageBox.Show("Mencari Biodata");
+                                            using (SQLiteDataReader reader = command.ExecuteReader())
+                                            {
+                                                if (reader.Read())
+                                                {
+                                                    // Baca data dari reader
+                                                    string nik = reader["nik"].ToString();
+                                                    string nama = reader["nama"].ToString();
+                                                    string tempatLahir = reader["tempat_lahir"].ToString();
+                                                    string tanggalLahir = reader["tanggal_lahir"].ToString();
+                                                    string jenisKelamin = reader["jenis_kelamin"].ToString();
+                                                    string golonganDarah = reader["golongan_darah"].ToString();
+                                                    string alamat = reader["alamat"].ToString();
+                                                    string agama = reader["agama"].ToString();
+                                                    string statusPerkawinan = reader["status_perkawinan"].ToString();
+                                                    string pekerjaan = reader["pekerjaan"].ToString();
+                                                    string kewarganegaraan = reader["kewarganegaraan"].ToString();
 
-                                            // reader.Close();
+                                                    // Tampilkan data di antarmuka pengguna
+                                                    txtBiodata.Text = $"NIK: {nik}\r\n" +
+                                                                      $"Nama: {nama}\r\n" +
+                                                                      $"Tempat Lahir: {tempatLahir}\r\n" +
+                                                                      $"Tanggal Lahir: {tanggalLahir}\r\n" +
+                                                                      $"Jenis Kelamin: {jenisKelamin}\r\n" +
+                                                                      $"Golongan Darah: {golonganDarah}\r\n" +
+                                                                      $"Alamat: {alamat}\r\n" +
+                                                                      $"Agama: {agama}\r\n" +
+                                                                      $"Status Perkawinan: {statusPerkawinan}\r\n" +
+                                                                      $"Pekerjaan: {pekerjaan}\r\n" +
+                                                                      $"Kewarganegaraan: {kewarganegaraan}\r\n";
+
+                                                    // Menampilkan data di antarmuka pengguna
+                                                    string biodataMessage = $"NIK: {nik}\r\n" +
+                                                                            $"Nama: {nama}\r\n" +
+                                                                            $"Tempat Lahir: {tempatLahir}\r\n" +
+                                                                            $"Tanggal Lahir: {tanggalLahir}\r\n" +
+                                                                            $"Jenis Kelamin: {jenisKelamin}\r\n" +
+                                                                            $"Golongan Darah: {golonganDarah}\r\n" +
+                                                                            $"Alamat: {alamat}\r\n" +
+                                                                            $"Agama: {agama}\r\n" +
+                                                                            $"Status Perkawinan: {statusPerkawinan}\r\n" +
+                                                                            $"Pekerjaan: {pekerjaan}\r\n" +
+                                                                            $"Kewarganegaraan: {kewarganegaraan}\r\n";
+
+                                                    // Tampilkan hasil biodata dalam MessageBox
+                                                    MessageBox.Show(biodataMessage, "Hasil Biodata", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                                }
+                                                else
+                                                {
+                                                    // Jika data tidak ditemukan
+                                                    MessageBox.Show("Data tidak ditemukan");
+                                                }
+                                            }
                                         }
                                         catch (Exception ex)
                                         {
@@ -416,6 +470,7 @@ namespace Stime
                                 {
                                     foundAlay = true;
                                     foundAlayName = alay;
+
                                     // Get biodata dari nama alay
                                     query = "SELECT * FROM biodata WHERE nama=@foundAlayName";
                                     using (SQLiteConnection sqliteConnection = new SQLiteConnection(connectionString))
@@ -427,8 +482,59 @@ namespace Stime
                                             command.Parameters.AddWithValue("@foundAlayName", foundAlayName);
 
                                             // Menampilkan biodata di interface
+                                            MessageBox.Show("Mencari Biodata");
+                                            using (SQLiteDataReader reader = command.ExecuteReader())
+                                            {
+                                                if (reader.Read())
+                                                {
+                                                    // Baca data dari reader
+                                                    string nik = reader["nik"].ToString();
+                                                    string nama = reader["nama"].ToString();
+                                                    string tempatLahir = reader["tempat_lahir"].ToString();
+                                                    string tanggalLahir = reader["tanggal_lahir"].ToString();
+                                                    string jenisKelamin = reader["jenis_kelamin"].ToString();
+                                                    string golonganDarah = reader["golongan_darah"].ToString();
+                                                    string alamat = reader["alamat"].ToString();
+                                                    string agama = reader["agama"].ToString();
+                                                    string statusPerkawinan = reader["status_perkawinan"].ToString();
+                                                    string pekerjaan = reader["pekerjaan"].ToString();
+                                                    string kewarganegaraan = reader["kewarganegaraan"].ToString();
 
-                                            // reader.Close();
+                                                    // Tampilkan data di antarmuka pengguna
+                                                    txtBiodata.Text = $"NIK: {nik}\r\n" +
+                                                                      $"Nama: {nama}\r\n" +
+                                                                      $"Tempat Lahir: {tempatLahir}\r\n" +
+                                                                      $"Tanggal Lahir: {tanggalLahir}\r\n" +
+                                                                      $"Jenis Kelamin: {jenisKelamin}\r\n" +
+                                                                      $"Golongan Darah: {golonganDarah}\r\n" +
+                                                                      $"Alamat: {alamat}\r\n" +
+                                                                      $"Agama: {agama}\r\n" +
+                                                                      $"Status Perkawinan: {statusPerkawinan}\r\n" +
+                                                                      $"Pekerjaan: {pekerjaan}\r\n" +
+                                                                      $"Kewarganegaraan: {kewarganegaraan}\r\n";
+
+                                                    // Menampilkan data di antarmuka pengguna
+                                                    string biodataMessage = $"NIK: {nik}\r\n" +
+                                                                            $"Nama: {nama}\r\n" +
+                                                                            $"Tempat Lahir: {tempatLahir}\r\n" +
+                                                                            $"Tanggal Lahir: {tanggalLahir}\r\n" +
+                                                                            $"Jenis Kelamin: {jenisKelamin}\r\n" +
+                                                                            $"Golongan Darah: {golonganDarah}\r\n" +
+                                                                            $"Alamat: {alamat}\r\n" +
+                                                                            $"Agama: {agama}\r\n" +
+                                                                            $"Status Perkawinan: {statusPerkawinan}\r\n" +
+                                                                            $"Pekerjaan: {pekerjaan}\r\n" +
+                                                                            $"Kewarganegaraan: {kewarganegaraan}\r\n";
+
+                                                    // Tampilkan hasil biodata dalam MessageBox
+                                                    MessageBox.Show(biodataMessage, "Hasil Biodata", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                                }
+                                                else
+                                                {
+                                                    // Jika data tidak ditemukan
+                                                    MessageBox.Show("Data tidak ditemukan");
+                                                }
+                                            }
                                         }
                                         catch (Exception ex)
                                         {
@@ -445,6 +551,7 @@ namespace Stime
                     // 9. Apabila masih belum ditemukan, gunakan algoritma levensthein
                     if (!foundAlay)
                     {
+                        MessageBox.Show("Mencari biodata pemilik sidik jari dengan Levensthein");
                         double highestSimilarityAlay = 0;
                         string mostSimilarAlay = null;
 
@@ -459,7 +566,7 @@ namespace Stime
                             }
                         }
 
-                        if (highestSimilarityAlay > 80) // Misalnya menggunakan batas 80 untuk kemiripan
+                        if (highestSimilarityAlay > 20) // Misalnya menggunakan batas 20 untuk kemiripan
                         {
                             foundAlay = true;
                             foundAlayName = mostSimilarAlay;
@@ -474,6 +581,49 @@ namespace Stime
                                     command.Parameters.AddWithValue("@foundAlayName", foundAlayName);
 
                                     // Menampilkan biodata di interface
+                                    MessageBox.Show("Mencari Biodata dengan Levenshtein");
+                                    using (SQLiteDataReader reader = command.ExecuteReader())
+                                    {
+                                        if (reader.Read())
+                                        {
+                                            // Baca data dari reader
+                                            string nik = reader["nik"].ToString();
+                                            string nama = reader["nama"].ToString();
+                                            string tempatLahir = reader["tempat_lahir"].ToString();
+                                            string tanggalLahir = reader["tanggal_lahir"].ToString();
+                                            string jenisKelamin = reader["jenis_kelamin"].ToString();
+                                            string golonganDarah = reader["golongan_darah"].ToString();
+                                            string alamat = reader["alamat"].ToString();
+                                            string agama = reader["agama"].ToString();
+                                            string statusPerkawinan = reader["status_perkawinan"].ToString();
+                                            string pekerjaan = reader["pekerjaan"].ToString();
+                                            string kewarganegaraan = reader["kewarganegaraan"].ToString();
+
+                                            // Tampilkan data di antarmuka pengguna
+                                            
+
+                                            // Menampilkan data di antarmuka pengguna
+                                            string biodataMessage = $"NIK: {nik}\r\n" +
+                                                                    $"Nama: {nama}\r\n" +
+                                                                    $"Tempat Lahir: {tempatLahir}\r\n" +
+                                                                    $"Tanggal Lahir: {tanggalLahir}\r\n" +
+                                                                    $"Jenis Kelamin: {jenisKelamin}\r\n" +
+                                                                    $"Golongan Darah: {golonganDarah}\r\n" +
+                                                                    $"Alamat: {alamat}\r\n" +
+                                                                    $"Agama: {agama}\r\n" +
+                                                                    $"Status Perkawinan: {statusPerkawinan}\r\n" +
+                                                                    $"Pekerjaan: {pekerjaan}\r\n" +
+                                                                    $"Kewarganegaraan: {kewarganegaraan}\r\n";
+
+                                            // Tampilkan hasil biodata dalam MessageBox
+                                            MessageBox.Show(biodataMessage, "Hasil Biodata", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                        }
+                                        else
+                                        {
+                                            // Jika data tidak ditemukan
+                                            MessageBox.Show("Data tidak ditemukan");
+                                        }
+                                    }
 
                                     // reader.Close();
                                 }
