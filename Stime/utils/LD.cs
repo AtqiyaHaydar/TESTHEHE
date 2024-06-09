@@ -50,15 +50,15 @@ class Levenshtein
         return similarity;
     }
 
-    static void Main()
-    {
-        string s1 = "eaten";
-        string s2 = "eating";
+    // static void Main()
+    // {
+    //     string s1 = "eaten";
+    //     string s2 = "eating";
 
-        int distance = ComputeLevenshteinDistance(s1, s2);
-        double similarity = ComputeSimilarityPercentage(s1, s2);
+    //     int distance = ComputeLevenshteinDistance(s1, s2);
+    //     double similarity = ComputeSimilarityPercentage(s1, s2);
 
-        Console.WriteLine("Levenshtein Distance: " + distance);
-        Console.WriteLine("Similarity: " + similarity + "%");
-    }
+    //     Console.WriteLine("Levenshtein Distance: " + distance);
+    //     Console.WriteLine("Similarity: " + similarity + "%");
+    // }
 }
