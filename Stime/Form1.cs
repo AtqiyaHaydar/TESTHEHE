@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Stime;
 using System.Data.SQLite;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Stime
@@ -165,6 +166,10 @@ namespace Stime
                                 if (kmp.KMPfunc(inputAscii, asciiString))
                                 {
                                     found = true;
+                                    // Mengganti Result Image menjadi gambar dari  hasilQuery[i]
+                                    string imagePath = Path.Combine("../../database", hasilQuery[i]);
+                                    ResultImage.Image = Image.FromFile(imagePath);
+                                    ResultImage.SizeMode = PictureBoxSizeMode.StretchImage;
                                     // Get nama dari pemilik sidik jari
                                     query = "SELECT nama FROM sidik_jari WHERE berkas_citra=@asciiString";
                                     using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -199,6 +204,10 @@ namespace Stime
                                 if (bm.Search(asciiString))
                                 {
                                     found = true;
+                                    // Mengganti Result Image menjadi gambar dari  hasilQuery[i]
+                                    string imagePath = Path.Combine("../../database", hasilQuery[i]);
+                                    ResultImage.Image = Image.FromFile(imagePath);
+                                    ResultImage.SizeMode = PictureBoxSizeMode.StretchImage;
                                     // Get nama dari pemilik sidik jari
                                     query = "SELECT nama FROM sidik_jari WHERE berkas_citra=@asciiString";
                                     using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -257,6 +266,7 @@ namespace Stime
                         }
                     }
 
+
                     query = "SELECT nama FROM sidik_jari WHERE berkas_citra=@mostSimiliarResult";
                     using (SQLiteConnection connection = new SQLiteConnection(connectionString))
                     {
@@ -300,13 +310,14 @@ namespace Stime
                     MessageBox.Show("Sidik jari tidak ditemukan di database.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
+                
                 if (found)
                 {
                     // 8. Menemukan nama di basis data biodata yang sesuai dengan regex dan menampilkan biodatanya
                     query = "SELECT nama FROM sidik_jari LIMIT 10";
                     List<string> hasilQueryAlay = new List<string>();
 
-                    string regexedName = RegexMatcher.GetPattern(nameFound);
+                    string regexedName = RegexMatcher.GenerateAlayString(nameFound);
                     bool foundAlay = false;
                     string foundAlayName = "";
 
@@ -927,6 +938,97 @@ namespace Stime
             pattern += @"\b"; // End of word boundary
 
             return pattern;
+        }
+
+        public static string GenerateAlayString(string input)
+        {
+            Random random = new Random();
+            StringBuilder result = new StringBuilder();
+
+            foreach (char c in input)
+            {
+                if (char.IsLetter(c))
+                {
+                    // Mengonversi huruf menjadi kombinasi huruf besar dan kecil
+                    char convertedChar = random.Next(0, 2) == 0 ? char.ToLower(c) : char.ToUpper(c);
+                    result.Append(convertedChar);
+                }
+                else
+                {
+                    result.Append(c);
+                }
+            }
+
+            string tempResult = result.ToString();
+            result.Clear();
+
+            foreach (char c in tempResult)
+            {
+                // Mengonversi huruf menjadi angka
+                switch (char.ToLower(c))
+                {
+                    case 'a':
+                        result.Append('4');
+                        break;
+                    case 'e':
+                        result.Append('3');
+                        break;
+                    case 'i':
+                        result.Append('1');
+                        break;
+                    case 'o':
+                        result.Append('0');
+                        break;
+                    case 's':
+                        result.Append('5');
+                        break;
+                    case 'g':
+                        result.Append('6');
+                        break;
+                    case 'b':
+                        result.Append('8');
+                        break;
+                    default:
+                        result.Append(c);
+                        break;
+                }
+            }
+
+            // Menyingkat kata-kata dengan menghilangkan huruf vokal
+            string shortenedResult = ShortenWords(result.ToString());
+
+            return shortenedResult;
+        }
+
+        static string ShortenWords(string input)
+        {
+            StringBuilder result = new StringBuilder();
+            bool previousWasVowel = false;
+
+            foreach (char c in input)
+            {
+                if (IsVowel(c))
+                {
+                    if (!previousWasVowel)
+                    {
+                        result.Append(c);
+                        previousWasVowel = true;
+                    }
+                }
+                else
+                {
+                    result.Append(c);
+                    previousWasVowel = false;
+                }
+            }
+
+            return result.ToString();
+        }
+
+        static bool IsVowel(char c)
+        {
+            char lower = char.ToLower(c);
+            return lower == 'a' || lower == 'e' || lower == 'i' || lower == 'o' || lower == 'u';
         }
     }
 }
