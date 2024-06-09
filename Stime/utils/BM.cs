@@ -137,7 +137,7 @@ namespace utils
         public static void Main(string[] args)
         {
             string text = "ANDHIKAFADILLAH";
-            string pattern = "ANDHIKAFADILLAH";
+            string pattern = "BB";
 
             BoyerMoore bm = new BoyerMoore(pattern, text);
             if (bm.Search(text))
