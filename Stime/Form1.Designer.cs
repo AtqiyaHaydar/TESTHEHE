@@ -1,4 +1,6 @@
-﻿namespace Stime
+﻿using System.Windows.Forms;
+
+namespace Stime
 {
     partial class Form1
     {
@@ -33,7 +35,7 @@
             this.InputImage = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.ResultImage = new System.Windows.Forms.PictureBox();
-            this.ListBiodatas = new System.Windows.Forms.Panel();
+            this.ListBiodatas = new System.Windows.Forms.TextBox();
             this.TubesStima = new System.Windows.Forms.Label();
             this.ChooseImageButton = new System.Windows.Forms.Button();
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
@@ -72,13 +74,21 @@
             this.ResultImage.TabIndex = 2;
             this.ResultImage.TabStop = false;
             // 
+            // 
             // ListBiodatas
             // 
             this.ListBiodatas.BackColor = System.Drawing.Color.White;
             this.ListBiodatas.Location = new System.Drawing.Point(674, 90);
+            this.ListBiodatas.Multiline = true; // Ensure the TextBox can display multiple lines
             this.ListBiodatas.Name = "ListBiodatas";
             this.ListBiodatas.Size = new System.Drawing.Size(300, 400);
             this.ListBiodatas.TabIndex = 3;
+     
+            // Add the TextBox to the form's controls
+            this.Controls.Add(this.ListBiodatas);
+
+            // Menambahkan kontrol teks ke dalam panel ListBiodatas
+            this.ListBiodatas.Controls.Add(txtBiodata);
             // 
             // TubesStima
             // 
@@ -173,7 +183,7 @@
         private System.Windows.Forms.PictureBox InputImage;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.PictureBox ResultImage;
-        private System.Windows.Forms.Panel ListBiodatas;
+        private System.Windows.Forms.TextBox ListBiodatas;
         private System.Windows.Forms.Label TubesStima;
         private System.Windows.Forms.Button ChooseImageButton;
         private System.ComponentModel.BackgroundWorker backgroundWorker2;
