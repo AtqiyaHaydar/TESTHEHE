@@ -588,7 +588,7 @@ namespace Stime
                                         {
                                             // Baca data dari reader
                                             string nik = reader["nik"].ToString();
-                                            string nama = reader["nama"].ToString();
+                                            string nama = nameFound;
                                             string tempatLahir = reader["tempat_lahir"].ToString();
                                             string tanggalLahir = reader["tanggal_lahir"].ToString();
                                             string jenisKelamin = reader["jenis_kelamin"].ToString();
