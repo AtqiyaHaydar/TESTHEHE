@@ -277,7 +277,7 @@ namespace Stime
                                 string inputAscii = binaryToAsciiResult[j];
 
                                 double similarity = Levenshtein.ComputeSimilarityPercentage(inputAscii, asciiString);
-                                if (similarity > highestSimilarity)
+                                if (similarity >= 80 && similarity > highestSimilarity)
                                 {
                                     highestSimilarity = similarity;
                                     mostSimilarResult = asciiString;
@@ -287,30 +287,43 @@ namespace Stime
                     }
 
 
-                    query = "SELECT nama FROM sidik_jari WHERE berkas_citra=@mostSimiliarResult";
-                    using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                    if (mostSimilarResult != null)
                     {
-                        try
+                        query = "SELECT berkas_citra FROM sidik_jari WHERE nama=@nama";
+                        using (SQLiteConnection connection = new SQLiteConnection(connectionString))
                         {
-                            connection.Open();
-                            SQLiteCommand command = new SQLiteCommand(query, connection);
-                            command.Parameters.AddWithValue("@mostSimiliarResult", mostSimilarResult);
+                            try
+                            {
+                                connection.Open();
+                                SQLiteCommand command = new SQLiteCommand(query, connection);
+                                command.Parameters.AddWithValue("@nama", mostSimilarResult);
 
-                            SQLiteDataReader reader = command.ExecuteReader();
-                            
-                                while (reader.Read())
+                                SQLiteDataReader reader = command.ExecuteReader();
+
+                                if (reader.Read())
                                 {
-                                    nameFound = reader.GetString(0);
+                                    string berkasCitra = reader.GetString(0);
+                                    string imagePath = Path.Combine("../../database", berkasCitra);
+                                    ResultImage.Image = Image.FromFile(imagePath);
+                                    ResultImage.SizeMode = PictureBoxSizeMode.StretchImage;
                                 }
-                            
+                                else
+                                {
+                                    MessageBox.Show("Berkas citra tidak ditemukan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                }
 
-                            reader.Close();
+                                reader.Close();
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
+                                MessageBox.Show("Error Terjadi", ex.Message);
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(string.Format("An error occurred: {0}", ex.Message));
-                            MessageBox.Show("Error Terjadi", ex.Message);
-                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Tidak ada citra yang cocok.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
 
